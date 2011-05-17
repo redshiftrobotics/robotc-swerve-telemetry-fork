@@ -27,6 +27,7 @@ namespace TelemetryFTC
 
         public static string         Mailbox     = null;     // from command line arg
         public static string         PortName    = null;     // from command line arg
+        public static bool           Joysticks   = true;     // from command line arg: enable joysticks if present
 
         public static TelemetryFTCUI        TheForm          = null;                    // our sole instance of the UI
         public static BluetoothSerialPort   ActiveBTPort     = null;                    // currently running/connected port
@@ -55,9 +56,10 @@ namespace TelemetryFTC
         static void Usage()
             {
             Program.ReportError(
-                "usage: TelemetryFTC [-mailboxn] [-port COMn]\n" +
+                "usage: TelemetryFTC [-mailboxn] [-port COMn] [-nojoy]\n" +
                 "    -mailboxn    the 'mailbox' on the NXT. default: -mailbox2\n" +
-                "    -port COMn   the serial port on which NXT is found."
+                "    -port COMn   the serial port on which NXT is found\n" +
+                "    -nojoy       do not enable joysticks by default"
                 );
             AbortProgram();
             }
@@ -71,11 +73,14 @@ namespace TelemetryFTC
                     if (args[iArg].Length > 1)
                         {
                         string param = args[iArg].Substring(1);
-                        switch (param)
+                        switch (param.ToLowerInvariant())
                             {
                         case "?":
                             Usage();
                             break;
+                        case "nojoy":
+                            Program.Joysticks = false;
+                            continue;
                         case "port":
                             iArg++;
                             if (iArg < args.Length)

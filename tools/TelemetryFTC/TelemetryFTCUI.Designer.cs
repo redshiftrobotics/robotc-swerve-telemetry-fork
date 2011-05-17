@@ -270,7 +270,7 @@ namespace TelemetryFTC
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "TelemetryFTCUI";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "TelemetryFTC v0.5";
+            this.Text = "TelemetryFTC v0.6";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NxtLogUI_FormClosing);
             this.Shown += new System.EventHandler(this.NxtLogUI_Shown);
             this.statusBar.ResumeLayout(false);

@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\</PublishUrlHistory>
-    <InstallUrlHistory />
+    <InstallUrlHistory>http://FTC417.codeplex.com/releases/clickonce/|http://ftc417.codeplex.com/releases/clickonce/|http://ftc417.codeplex/</InstallUrlHistory>
     <SupportUrlHistory />
     <UpdateUrlHistory />
     <BootstrapperUrlHistory />

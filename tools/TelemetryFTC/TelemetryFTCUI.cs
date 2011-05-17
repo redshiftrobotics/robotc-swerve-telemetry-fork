@@ -133,7 +133,7 @@ namespace TelemetryFTC
             InitializeComboBoxPortSelection();
             InitializeComboBoxMailbox();
             //
-            this.checkBoxJoystickControl.Checked = JoystickController.HasControllers();
+            this.checkBoxJoystickControl.Checked = Program.Joysticks && JoystickController.HasControllers();
             //
             labelPortSelection.Text = strOld;
             }

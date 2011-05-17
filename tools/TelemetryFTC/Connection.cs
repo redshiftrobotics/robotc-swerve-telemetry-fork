@@ -1,6 +1,14 @@
 ﻿//
 // Connection.cs
 //
+// http://social.msdn.microsoft.com/forums/en-US/netfxbcl/thread/e36193cd-a708-42b3-86b7-adff82b19e5e/
+// http://social.msdn.microsoft.com/Forums/en-US/netfxbcl/thread/3f133c67-5920-4f5d-9902-7006e0144af6
+// http://social.msdn.microsoft.com/forums/en-US/netfxbcl/thread/f334ecce-eca3-46fd-8b65-27c02a1d4fea/
+// http://www.innovatic.dk/knowledg/SerialCOM/SerialCOM.htm
+// http://social.msdn.microsoft.com/Forums/en-US/netfxbcl/thread/d1d1065a-ca2b-4f69-a95d-8c1c633c299e
+
+// http://zachsaw.blogspot.com/2010/07/net-serialport-woes.html
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -350,7 +358,7 @@ namespace TelemetryFTC
 
         static public string DefaultPortName = "COM1";
 
-        protected System.IO.Ports.SerialPort  serialPort = new System.IO.Ports.SerialPort();
+        protected System.IO.Ports.SerialPort  serialPort;
         protected List<TelemetryMessage>      messages   = new List<TelemetryMessage>();
 
         public string                  PortName { set { serialPort.PortName = value; } }
@@ -365,6 +373,12 @@ namespace TelemetryFTC
 
         public SerialConnection()
             {
+            InitializeSerialPort();
+            }
+
+        void InitializeSerialPort()
+            {
+            serialPort = new System.IO.Ports.SerialPort();
             serialPort.DiscardNull  = false;
             serialPort.ReadTimeout  = 500;
             serialPort.WriteTimeout = 500;
@@ -399,6 +413,18 @@ namespace TelemetryFTC
             if (serialPort.IsOpen)
                 {
                 serialPort.Close();
+                //
+                // From the doc'n to serialPort.Close():
+                //  "The best practice for any application is to wait for some amount of time after calling 
+                //   the Close method before attempting to call the Open method, as the port may not be closed instantly"
+                // Gack.
+                //
+                System.Threading.Thread.Sleep(100);
+                //
+                // Sheer paranoia: clean up the old port and get me a new one!
+                // 
+                serialPort.Dispose();
+                InitializeSerialPort();
                 }
             }
 

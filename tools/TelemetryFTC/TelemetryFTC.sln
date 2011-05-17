@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryFTC", "TelemetryFTC.csproj", "{DB5151A6-38FF-42C5-90E3-8E37916FA47F}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Install", "Install\Install.vdproj", "{0D740F85-C723-43B0-8485-420F604F0DE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +15,8 @@ Global
 		{DB5151A6-38FF-42C5-90E3-8E37916FA47F}.Debug|x86.Build.0 = Debug|x86
 		{DB5151A6-38FF-42C5-90E3-8E37916FA47F}.Release|x86.ActiveCfg = Release|x86
 		{DB5151A6-38FF-42C5-90E3-8E37916FA47F}.Release|x86.Build.0 = Release|x86
+		{0D740F85-C723-43B0-8485-420F604F0DE3}.Debug|x86.ActiveCfg = Debug
+		{0D740F85-C723-43B0-8485-420F604F0DE3}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
