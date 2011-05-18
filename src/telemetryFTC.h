@@ -23,8 +23,10 @@
 #define TelemetryAddString(str)     TelemetryAddString_(telemetry,str)
 
 // Call to transmit the currently constructed telemetry record and
-// then initialize a new, empty one
-#define TelemetrySend()             TelemetrySend_(telemetry)
+// then initialize a new, empty one. TelemetrySendStream allows
+// independent streams of telemetry records to be transmitted.
+#define TelemetrySend()             TelemetrySend_(telemetry,0)
+#define TelemetrySendStream(istm)   TelemetrySend_(telemetry,istm)
 
 // (Optional) inform the recevier that no more telemetry will be
 // forthcoming from this program.
@@ -188,13 +190,14 @@ TELEMETRY telemetry;
         }                                                       \
     }
 
-#define TelemetrySend_(log)                                                     \
+#define TelemetrySend_(log, istm)                                               \
     {                                                                           \
     if (log.fActive) {                                                          \
         while (bBTBusy)                                                         \
             {                                                                   \
             EndTimeSlice();                                                     \
             }                                                                   \
+        log.rgbMsg[0] |= ((istm) << 4);                                         \
         cCmdMessageWriteToBluetooth(log.rgbMsg[0], log.cbMsg, log.mailbox);     \
         while (nBluetoothCmdStatus==ioRsltCommPending)                          \
             {                                                                   \

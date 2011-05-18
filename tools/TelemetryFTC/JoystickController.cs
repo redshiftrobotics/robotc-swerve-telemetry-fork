@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace TelemetryFTC
     {
@@ -227,14 +228,11 @@ namespace TelemetryFTC
 
         public static void ControllerTest()
             {
-            Program.Trace("starting...");
-            for (;;)
-                {
-                foreach (JoystickController jyc in Controllers)
-                    {
-                    jyc.TestTrace();
-                    }
-                }
+            Excel.Application app = TelemetryFTCUI.GetExcelApp();
+            app.Workbooks.Add();
+            Excel.Worksheet sheet = (Excel.Worksheet)(app.Worksheets[1]);
+            Excel.Worksheet sheet2 = (Excel.Worksheet)(app.Worksheets[2]);
+            Excel.Workbook wb     = (Excel.Workbook)(Program.TelemetryContext.Sheet.Parent);
             }
         }
     }

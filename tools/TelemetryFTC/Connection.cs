@@ -80,20 +80,18 @@ namespace TelemetryFTC
 
         public BluetoothSerialPort()
             {
-            telemetryReceiveThread  = new ThreadContext((ctx) => ReceiveTelemetryMessages((ThreadContext)ctx));
-            telemetrySendThread     = new ThreadContext((ctx) => SendNxtMessages((ThreadContext)ctx));
             }
 
-        TelemetryFTCConnection  connection   = new TelemetryFTCConnection();
+        TelemetryFTCConnection  connection;
         ThreadContext           telemetryReceiveThread;
         ThreadContext           telemetrySendThread;
-        List<NxtMessage>        messagesToSend = new List<NxtMessage>();
+        List<NxtMessage>        messagesToSend;
 
         //--------------------------------------------------------------------------
         // Communication
         //--------------------------------------------------------------------------
 
-        public bool IsOpen { get { return this.connection.IsOpen; }}
+        public bool IsOpen { get { return this.connection != null && this.connection.IsOpen; }}
 
         public void Open()
         // Idempotent
@@ -101,12 +99,15 @@ namespace TelemetryFTC
             if (!this.IsOpen)
                 {
                 try {
+                    this.messagesToSend      = new List<NxtMessage>();
+                    this.connection          = new TelemetryFTCConnection();
                     this.connection.PortName = this.PortName;
                     this.connection.Open();
                     }
                 catch (System.TimeoutException)
                     {
                     this.connection.Close();    // REVIEW: more of an error message?
+                    this.connection = null;
                     }
                 }
             }
@@ -117,6 +118,7 @@ namespace TelemetryFTC
             if (this.IsOpen)
                 {
                 this.connection.Close();
+                this.connection = null;
                 }
             }
 
@@ -125,12 +127,21 @@ namespace TelemetryFTC
             {
             if (fUseJoystick && JoystickController.HasControllers())
                 {
-                this.telemetrySendThread.Start();
+                if (null == this.telemetrySendThread)
+                    {
+                    this.telemetrySendThread = new ThreadContext((ctx) => SendNxtMessages((ThreadContext)ctx));
+                    this.telemetrySendThread.Start();
+                    }
                 //
                 Program.ActiveBTPort = this;
                 Program.TheForm.timerJoystickTransmission.Enabled = true;
                 }
-            this.telemetryReceiveThread.Start();
+            //
+            if (null == this.telemetryReceiveThread)
+                {
+                this.telemetryReceiveThread = new ThreadContext((ctx) => ReceiveTelemetryMessages((ThreadContext)ctx));
+                this.telemetryReceiveThread.Start();
+                }
             }
 
         public void Stop()
@@ -139,8 +150,11 @@ namespace TelemetryFTC
             Program.TheForm.timerJoystickTransmission.Enabled = false;
             Program.ActiveBTPort = null;
             //
-            this.telemetryReceiveThread.Stop();
-            this.telemetrySendThread.Stop();
+            if (null != this.telemetryReceiveThread) this.telemetryReceiveThread.Stop();
+            if (null != this.telemetrySendThread)    this.telemetrySendThread.Stop();
+            //
+            this.telemetryReceiveThread = null;
+            this.telemetrySendThread    = null;
             }
 
         //-------------------------------
@@ -191,52 +205,51 @@ namespace TelemetryFTC
 
         void ReceiveTelemetryMessages(ThreadContext ctx)
             {
-            Excel.Worksheet sheet = Program.TelemetryContext.sheet;
+            bool fEof = false;
             //
-            if (null != sheet)
+            WaitHandle[] waitHandles = new WaitHandle[2];
+            waitHandles[0] = this.connection.MessageAvailableEvent;
+            waitHandles[1] = ctx.StopEvent;
+            //
+            for (; !ctx.StopRequest && !fEof ;)
                 {
-                bool fEof = false;
-                //
-                WaitHandle[] waitHandles = new WaitHandle[2];
-                waitHandles[0] = this.connection.MessageAvailableEvent;
-                waitHandles[1] = ctx.StopEvent;
-                //
-                for (int iRow = 0; !ctx.StopRequest && !fEof ; )
-                    {
-                    int iWait = WaitHandle.WaitAny(waitHandles);
+                int iWait = WaitHandle.WaitAny(waitHandles);
 
-                    switch (iWait)
+                switch (iWait)
+                    {
+                case 0: // MessageAvailableEvent
+                    {
+                    // There's data there to read. 
+                    for (;!fEof;)
                         {
-                    case 0: // MessageAvailableEvent
-                        {
-                        // There's data there to read. 
-                        for (;!fEof;)
+                        TelemetryMessage message = null;
+                        lock (connection.Records)
                             {
-                            TelemetryMessage message = null;
-                            lock (connection.Records)
-                                {
-                                if (0 == connection.Records.Count)
-                                    break;
-                                message = connection.Records[0];
-                                connection.Records.RemoveAt(0);
-                                }
-                            message.Parse();
-                            //
-                            if (message.fEof || message.data.Count == 0)
-                                {
-                                fEof = true;
-                                }
-                            else
-                                {
-                                message.PostToSheet(sheet, iRow++);
-                                }
+                            if (0 == connection.Records.Count)
+                                break;
+                            message = connection.Records[0];
+                            connection.Records.RemoveAt(0);
                             }
-                        break;
+                        message.Parse();
+                        //
+                        if (message.fEof || message.data.Count == 0)
+                            {
+                            fEof = true;
+                            }
+                        else
+                            {
+                            TelemetryFTCUI.ShowWaitCursorWhile(() =>
+                                { 
+                                Program.TheForm.OpenLoggingDestinationIfNecessary(); 
+                                });
+                            message.PostToSheet();
+                            }
                         }
-                    case 1: // StopEvent
-                        break;
-                    // end switch
-                        }
+                    break;
+                    }
+                case 1: // StopEvent
+                    break;
+                // end switch
                     }
                 }
             }

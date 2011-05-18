@@ -3,6 +3,7 @@
 //
 using System;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Collections.Generic;
 
 namespace TelemetryFTC
     {
@@ -12,9 +13,36 @@ namespace TelemetryFTC
 
     public class TelemetryContext
         {
-        public Excel.Worksheet sheet;
-        public int             iRowFirst;
-        public int             iColFirst;
+        public class Cursor
+            {
+            public int iRow;
+            public int iCol;
+            }
+
+        public Excel.Workbook               Workbook;
+        public Excel.Worksheet              Sheet;
+        public IDictionary<int, Cursor>     Cursors;
+
+        public TelemetryContext()
+            {
+            Initialize();
+            }
+
+        public void Initialize()
+            {
+            this.Workbook = null;
+            this.Sheet    = null;
+            this.Cursors  = new Dictionary<int, Cursor>();
+            }
+
+        public Cursor InitCursor(int iRow, int iCol)
+            {
+            Cursor cursor = new Cursor();
+            cursor.iRow = iRow;
+            cursor.iCol = iCol;
+            this.Cursors[this.Sheet.Index] = cursor;
+            return cursor;
+            }
         };
 
     class Program

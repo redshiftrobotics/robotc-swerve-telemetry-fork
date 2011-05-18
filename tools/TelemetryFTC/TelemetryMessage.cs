@@ -58,7 +58,11 @@ namespace TelemetryFTC
             ib += cb;
             }
 
-        // Parse the message contents
+        // Parse the message contents. The message is a sequence of tagged data, where the tags are
+        // drawn from DATUM_TYPE. Each type of data has its own data format, which is pretty straightfoward.
+        // Note that only the lower four bits of the tags is significant. The upper four bits of the first
+        // tag indicates the (zero-based) Sheet number which is to be logged to; the upper four bits of
+        // remaining tags are currently unused.
         public void Parse()
             {
             this.data = new List<object>();
@@ -68,7 +72,8 @@ namespace TelemetryFTC
             // Parse the data in the message
             for (int ib = 0; !fDone && ib < this.cbBuffer; )
                 {
-                switch (this.rgbBuffer[ib++])
+                byte bTag = this.rgbBuffer[ib++];
+                switch (bTag & 0x0F)
                     {
                 case (byte)DATUM_TYPE.INT8:
                     Parse(ref ib, sizeof(sbyte), rgb => (sbyte)(rgb[0]), false);
@@ -116,6 +121,19 @@ namespace TelemetryFTC
                 }
             }
 
+        int sheetIndex { get 
+        // return the zero-based sheet index in which we are to post this data
+            {
+            if (this.cbBuffer > 0)
+                {
+                return ((this.rgbBuffer[0] >> 4) & 0x0F);
+                }
+            else
+	            {
+                return 0;
+	            }
+            }}
+
         //--------------------------------------------------------------------------
         // Excel communication
         //--------------------------------------------------------------------------
@@ -137,47 +155,44 @@ namespace TelemetryFTC
             return result.ToString();
             }
 
-        // Send the parsed data to the indicated sheet at the indicated location
-        public void PostToSheet(Excel._Worksheet sheet, int iRow)
+        // Send the parsed data to the worksheet at the indicated location
+        public void PostToSheet()
             {
-            Excel.Range range = sheet.get_Range(
-                CellName(Program.TelemetryContext.iRowFirst+iRow, Program.TelemetryContext.iColFirst+0), 
-                CellName(Program.TelemetryContext.iRowFirst+iRow, Program.TelemetryContext.iColFirst+data.Count-1)
-                );
-            range.set_Value(value: data.ToArray());
-            }
+            // Make sure we have the right sheet
+            if (null != Program.TelemetryContext.Sheet)
+                {
+                int index = this.sheetIndex + 1;
+                if (Program.TelemetryContext.Sheet.Index != index)
+                    {
+                    Excel.Workbook wb = Program.TelemetryContext.Workbook;
+                    //
+                    while (wb.Worksheets.Count < index)
+                        {
+                        wb.Worksheets.Add(After: wb.Worksheets[wb.Worksheets.Count]);
+                        }
+                    //
+                    Program.TelemetryContext.Sheet = wb.Worksheets[index];
+                    }
+                }
 
-        //----------------------------------------------------
-        // Testing
-        //----------------------------------------------------
+            // Put the data on the sheet, and advance the cursor so that the 
+            // next record won't overwrite it
+            if (null != Program.TelemetryContext.Sheet)
+                {
+                TelemetryContext.Cursor cursor;
+                if (!Program.TelemetryContext.Cursors.TryGetValue(Program.TelemetryContext.Sheet.Index, out cursor))
+                    {
+                    cursor = Program.TelemetryContext.InitCursor(0,0);
+                    }
 
-        void AddDatum(DATUM_TYPE type, byte[] rgb)
-            {
-            rgbBuffer[cbBuffer++] = (byte)type;
-            rgb.CopyTo(rgbBuffer, cbBuffer);
-            cbBuffer += rgb.Length;
-            }
+                Excel.Range range = Program.TelemetryContext.Sheet.get_Range(
+                    CellName(cursor.iRow, cursor.iCol+0), 
+                    CellName(cursor.iRow, cursor.iCol+data.Count-1)
+                    );
+                range.set_Value(value: data.ToArray());
 
-        public void AddFloat(float value)
-            {
-            AddDatum(DATUM_TYPE.FLOAT, BitConverter.GetBytes(value));
-            }
-        public void AddInt16(short value)
-            {
-            AddDatum(DATUM_TYPE.INT16, BitConverter.GetBytes(value));
-            }
-        public void AddInt32(int value)
-            {
-            AddDatum(DATUM_TYPE.INT32, BitConverter.GetBytes(value));
-            }
-
-        public static TelemetryMessage TestRecord()
-            {
-            TelemetryMessage result = new TelemetryMessage();
-            result.AddFloat(3.1415f);
-            result.AddInt16(-32);
-            result.AddInt32(65536);
-            return result;
+                cursor.iRow++;
+                }
             }
         }
 

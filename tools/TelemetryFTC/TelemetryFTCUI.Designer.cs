@@ -40,10 +40,6 @@ namespace TelemetryFTC
             this.buttonConnect = new System.Windows.Forms.Button();
             this.buttonDisconnect = new System.Windows.Forms.Button();
             this.textBoxLoggingDestination = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.statusBarBanter = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusBarTeamWebSite = new System.Windows.Forms.ToolStripStatusLabel();
@@ -106,7 +102,7 @@ namespace TelemetryFTC
             // buttonConnect
             // 
             this.buttonConnect.Enabled = false;
-            this.buttonConnect.Location = new System.Drawing.Point(73, 202);
+            this.buttonConnect.Location = new System.Drawing.Point(73, 107);
             this.buttonConnect.Name = "buttonConnect";
             this.buttonConnect.Size = new System.Drawing.Size(75, 23);
             this.buttonConnect.TabIndex = 4;
@@ -117,7 +113,7 @@ namespace TelemetryFTC
             // buttonDisconnect
             // 
             this.buttonDisconnect.Enabled = false;
-            this.buttonDisconnect.Location = new System.Drawing.Point(176, 202);
+            this.buttonDisconnect.Location = new System.Drawing.Point(176, 107);
             this.buttonDisconnect.Name = "buttonDisconnect";
             this.buttonDisconnect.Size = new System.Drawing.Size(75, 23);
             this.buttonDisconnect.TabIndex = 5;
@@ -132,47 +128,12 @@ namespace TelemetryFTC
             this.textBoxLoggingDestination.Name = "textBoxLoggingDestination";
             this.textBoxLoggingDestination.Size = new System.Drawing.Size(307, 20);
             this.textBoxLoggingDestination.TabIndex = 3;
+            this.textBoxLoggingDestination.Visible = false;
             this.textBoxLoggingDestination.TextChanged += new System.EventHandler(this.textBoxLoggingDestination_TextChanged);
             this.textBoxLoggingDestination.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBoxLoggingDestination_DragDrop);
             this.textBoxLoggingDestination.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBoxLoggingDestination_DragEnter);
             this.textBoxLoggingDestination.DragOver += new System.Windows.Forms.DragEventHandler(this.textBoxLoggingDestination_DragOver);
             this.textBoxLoggingDestination.DragLeave += new System.EventHandler(this.textBoxLoggingDestination_DragLeave);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 106);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(124, 13);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "Data logging destination:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 123);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(203, 13);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "Leave empty to create a new Excel sheet";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 140);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(280, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Drag && drop from an Excel cell to indicate specific location";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 157);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(160, 13);
-            this.label4.TabIndex = 11;
-            this.label4.Text = "Or type the name of an Excel file";
             // 
             // statusBar
             // 
@@ -181,7 +142,7 @@ namespace TelemetryFTC
             this.statusBarTeamWebSite,
             this.statusBarSpacing,
             this.statusBarHelp});
-            this.statusBar.Location = new System.Drawing.Point(0, 236);
+            this.statusBar.Location = new System.Drawing.Point(0, 143);
             this.statusBar.Name = "statusBar";
             this.statusBar.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
             this.statusBar.Size = new System.Drawing.Size(331, 22);
@@ -251,14 +212,10 @@ namespace TelemetryFTC
             this.AcceptButton = this.buttonConnect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(331, 258);
+            this.ClientSize = new System.Drawing.Size(331, 165);
             this.Controls.Add(this.labelJoystickCount);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.statusBar);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxLoggingDestination);
             this.Controls.Add(this.buttonDisconnect);
             this.Controls.Add(this.buttonConnect);
@@ -270,7 +227,7 @@ namespace TelemetryFTC
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "TelemetryFTCUI";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "TelemetryFTC v0.6";
+            this.Text = "TelemetryFTC v0.61";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NxtLogUI_FormClosing);
             this.Shown += new System.EventHandler(this.NxtLogUI_Shown);
             this.statusBar.ResumeLayout(false);
@@ -290,10 +247,6 @@ namespace TelemetryFTC
         private System.Windows.Forms.Button buttonConnect;
         private System.Windows.Forms.Button buttonDisconnect;
         private System.Windows.Forms.TextBox textBoxLoggingDestination;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ToolStripStatusLabel statusBarBanter;
         private System.Windows.Forms.StatusStrip statusBar;
         private System.Windows.Forms.ToolStripStatusLabel statusBarTeamWebSite;

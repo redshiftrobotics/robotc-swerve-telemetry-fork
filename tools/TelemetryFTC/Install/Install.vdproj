@@ -184,15 +184,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TelemetryFTC"
-        "ProductCode" = "8:{2E68E4C7-0744-466E-A993-2FEBBC271C0B}"
-        "PackageCode" = "8:{52519BE8-90C7-434B-AFBE-78E98FD5DA2F}"
+        "ProductCode" = "8:{BF778995-A29C-4C8D-8AC2-988F166F53D3}"
+        "PackageCode" = "8:{615864AD-2035-4BDB-8154-4C7504EC0F93}"
         "UpgradeCode" = "8:{B4672A1C-6305-410F-87AB-A240565B6A2D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.6"
+        "ProductVersion" = "8:0.61"
         "Manufacturer" = "8:FTC Team 417"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -734,7 +734,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_09E74144DE9A444D885879826631F8DE"
             {
-            "SourcePath" = "8:..\\obj\\x86\\Release\\TelemetryFTC.exe"
+            "SourcePath" = "8:..\\obj\\x86\\Debug\\TelemetryFTC.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_950E2602D63F4D8989B77992F5349952"

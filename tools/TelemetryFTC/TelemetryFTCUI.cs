@@ -177,7 +177,8 @@ namespace TelemetryFTC
             this.checkBoxJoystickControl.Enabled   = fConnection && JoystickController.HasControllers();
             this.comboBoxMailbox.Enabled           = fConnection;
             this.comboBoxPortSelection.Enabled     = fConnection;
-            this.textBoxLoggingDestination.Enabled = fConnection;
+
+            this.textBoxLoggingDestination.Enabled = false; // fConnection;   // deprecated
 
             this.labelJoystickCount.Text = String.Format("{0} joystick{1} detected", 
                 IntToWords(JoystickController.Controllers.Count),
@@ -230,7 +231,7 @@ namespace TelemetryFTC
                     {
                     ShowWaitCursorWhile(() => { 
                         try {
-                            OpenLoggingDestination();
+                            // OpenLoggingDestination();
                             port.Open(); 
                             port.Run(this.checkBoxJoystickControl.Checked);
                             }
@@ -251,6 +252,7 @@ namespace TelemetryFTC
                 {
                 port.Stop();
                 port.Close();
+                CloseLoggingDestination();
                 UpdateEnabledState();
                 }
             }
@@ -258,6 +260,19 @@ namespace TelemetryFTC
         //--------------------------------------------------------------------------
         // Logging destination 
         //--------------------------------------------------------------------------
+
+        public void OpenLoggingDestinationIfNecessary()
+            {
+            if (null == Program.TelemetryContext.Sheet)
+                {
+                OpenLoggingDestination();
+                }
+            }
+
+        void CloseLoggingDestination()
+            {
+            Program.TelemetryContext.Initialize();
+            }
 
         void OpenLoggingDestination()
             {
@@ -287,25 +302,22 @@ namespace TelemetryFTC
                     dynamic sel = ((Excel.Workbook)punk).Application.Selection;
                     Excel.Range range = (Excel.Range)sel;               // REVIEW: might throw if not just one range?
 
-                    // Remember the sheet
-                    Program.TelemetryContext.sheet = range.Worksheet;
+                    // Remember the Sheet
+                    Program.TelemetryContext.Sheet = range.Worksheet;
 
-                    // Remember the location on the sheet. But if the whole sheet is selected,
-                    // change the selection just as we do for a new blank sheet. We hit this case
+                    // Remember the location on the Sheet. But if the whole Sheet is selected,
+                    // change the selection just as we do for a new blank Sheet. We hit this case
                     // when the moniker we bound is the whole file, e.g., c:\tmp\book2.xlsx
                     long cCellFullSheet = (long)16384 * 1048576;
                     long cCellSelected  = range.CountLarge;
                     if (cCellSelected >= cCellFullSheet)
                         {
-                        Program.TelemetryContext.iRowFirst = 1;
-                        Program.TelemetryContext.iColFirst = 0;
-                        //
-                        Program.TelemetryContext.sheet.get_Range(TelemetryMessage.CellName(1,0)).Select();
+                        Program.TelemetryContext.InitCursor(0,0);
+                        Program.TelemetryContext.Sheet.get_Range(TelemetryMessage.CellName(0,0)).Select();
                         }
                     else
                         {
-                        Program.TelemetryContext.iRowFirst = range.Row    -1;
-                        Program.TelemetryContext.iColFirst = range.Column -1;
+                        Program.TelemetryContext.InitCursor(-1, -1);
                         }
                     }
                 else
@@ -313,23 +325,22 @@ namespace TelemetryFTC
                     throw new InvalidComObjectException("logging destination not an Excel sheet");
                     }
                 }
-            else if (this.textBoxLoggingDestination.Text.Length > 0)
-                {
-                // We should have handled this case already
-                throw new InvalidOperationException("internal error");
-                }
             else
                 {
-                // Open a new Excel sheet. Leave a blank row at the top of the sheet for later additions of headers by the user.
+                // Open a new Excel workbook
                 Excel.Application app = GetExcelApp();
                 app.Workbooks.Add();
-                Program.TelemetryContext.sheet     = (Excel.Worksheet)(app.Worksheets.get_Item(1));
-                Program.TelemetryContext.iRowFirst = 1;
-                Program.TelemetryContext.iColFirst = 0;
+                Program.TelemetryContext.Sheet = (Excel.Worksheet)(app.Worksheets[1]);
+                Program.TelemetryContext.InitCursor(0,0);
+                }
+
+            if (null != Program.TelemetryContext.Sheet)
+                {
+                Program.TelemetryContext.Workbook = (Excel.Workbook)(Program.TelemetryContext.Sheet.Parent);
                 }
             }
 
-        static Excel.Application GetExcelApp()
+        public static Excel.Application GetExcelApp()
             {
             Excel.Application app = null;
 
