@@ -100,7 +100,7 @@ namespace TelemetryFTC
             // instance. 
             this.formatDesc = State.GetDataRetrievalDescriptor();
             this.directInputDevice.SetDataFormat(ref this.formatDesc);
-	        }
+                }
 
         ~JoystickController()
             {
@@ -194,45 +194,6 @@ namespace TelemetryFTC
                 //
                 return format;
                 }
-            }
-
-        //--------------------------------------------------------------------------
-        // Testing
-        //--------------------------------------------------------------------------
-
-        void TestTrace()
-            {
-            State statePrev = this.state;
-            this.ReadCurrentState();
-            //
-            if (this.state.x != statePrev.x) Program.Trace("x={0}", this.state.x);
-            if (this.state.y != statePrev.y) Program.Trace("y={0}", this.state.y);
-            if (this.state.z != statePrev.z) Program.Trace("z={0}", this.state.z);
-            if (this.state.rotationZ != statePrev.rotationZ) Program.Trace("rz={0}", this.state.rotationZ);
-            //
-            if (this.state.pov       != statePrev.pov)       Program.Trace("pov={0}", this.state.pov);
-            //
-            if (this.state.button0   != statePrev.button0)   Program.Trace("b0={0}", this.state.button0!=0);
-            if (this.state.button1   != statePrev.button1)   Program.Trace("b1={0}", this.state.button1!=0);
-            if (this.state.button2   != statePrev.button2)   Program.Trace("b2={0}", this.state.button2!=0);
-            if (this.state.button3   != statePrev.button3)   Program.Trace("b3={0}", this.state.button3!=0);
-            if (this.state.button4   != statePrev.button4)   Program.Trace("b4={0}", this.state.button4!=0);
-            if (this.state.button5   != statePrev.button5)   Program.Trace("b5={0}", this.state.button5!=0);
-            if (this.state.button6   != statePrev.button6)   Program.Trace("b6={0}", this.state.button6!=0);
-            if (this.state.button7   != statePrev.button7)   Program.Trace("b7={0}", this.state.button7!=0);
-            if (this.state.button8   != statePrev.button8)   Program.Trace("b8={0}", this.state.button8!=0);
-            if (this.state.button9   != statePrev.button9)   Program.Trace("b9={0}", this.state.button9!=0);
-            if (this.state.button10  != statePrev.button10)  Program.Trace("b10={0}", this.state.button10!=0);
-            if (this.state.button11  != statePrev.button11)  Program.Trace("b11={0}", this.state.button11!=0);
-            }
-
-        public static void ControllerTest()
-            {
-            Excel.Application app = TelemetryFTCUI.GetExcelApp();
-            app.Workbooks.Add();
-            Excel.Worksheet sheet = (Excel.Worksheet)(app.Worksheets[1]);
-            Excel.Worksheet sheet2 = (Excel.Worksheet)(app.Worksheets[2]);
-            Excel.Workbook wb     = (Excel.Workbook)(Program.TelemetryContext.Sheet.Parent);
             }
         }
     }

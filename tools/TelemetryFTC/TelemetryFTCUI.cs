@@ -16,19 +16,19 @@ namespace TelemetryFTC
         // State
         //--------------------------------------------------------------------------
 
-        // The serial ports that we know to be Bluetooth underneath
-        List<BluetoothSerialPort> bluetoothPorts;
+        // The NXTs that we know about
+        List<KnownNXT> knownNXTs;
 
-        // The port that is currently opened
-        BluetoothSerialPort openedPort;
+        // The the currently active NXT, if any
+        KnownNXT currentNXT;
 
-        // If we have a moniker to the logging destination, then this is it
-        COMTypes.IMoniker _pmkLoggingDestination;
+        // If we have a moniker to the telemetry destination, then this is it
+        COMTypes.IMoniker _pmkTelemetryDestination;
 
-        COMTypes.IMoniker pmkLoggingDestination 
+        COMTypes.IMoniker pmkTelemetryDestination 
             { 
-            get { return _pmkLoggingDestination; }
-            set { _pmkLoggingDestination = value; Program.Trace("moniker now {0}", null==_pmkLoggingDestination ? "null" : "non-null"); }
+            get { return _pmkTelemetryDestination; }
+            set { _pmkTelemetryDestination = value; Program.Trace("moniker now {0}", null==_pmkTelemetryDestination ? "null" : "non-null"); }
             }
 
         //--------------------------------------------------------------------------
@@ -38,69 +38,104 @@ namespace TelemetryFTC
         public TelemetryFTCUI()
             {
             Program.TheForm = this;
-            COM.OleInitialize(IntPtr.Zero);
+            WIN32.OleInitialize(IntPtr.Zero);
             InitializeComponent();
             }
 
         void IDisposable.Dispose()
             {
-            COM.OleUninitialize();
+            WIN32.OleUninitialize();
             }
 
-        void InitializeComboBoxPortSelection()
+        void InitializeComboBoxNXTSelection()
             {
-            // Find all the bluetooth serial ports
+            // Initialize to a clean slate
+            this.comboBoxNXTSelection.Items.Clear();
+
+            // Populate with all the known NXTs, probing each to get it's connected/disconnected status
             //
-            this.bluetoothPorts = BluetoothSerialPort.Ports;
-            foreach (BluetoothSerialPort port in this.bluetoothPorts)
+            this.knownNXTs = KnownNXT.KnownNXTs;
+            foreach (KnownNXT knownNXT in this.knownNXTs)
                 {
-                port.ProbeForNXT();
-                this.comboBoxPortSelection.Items.Add(port);
+                knownNXT.ProbeForNXT();
+                this.comboBoxNXTSelection.Items.Add(knownNXT);
                 }
             
-            // Select a reasonable default
+            // Select something in the list of items
             //
-            this.comboBoxPortSelection.SelectedIndex = -1;
+            this.comboBoxNXTSelection.SelectedIndex = -1;
             //
-            if (Program.PortName != null)
+            // If the user said to connect to a particular item, then select that one.
+            // REVIEW: this needs more testing.
+            //
+            if (Program.NXTConnectionID != null)
                 {
-                this.comboBoxPortSelection.SelectedIndex = this.comboBoxPortSelection.FindString(Program.PortName);
+                this.comboBoxNXTSelection.SelectedIndex = this.comboBoxNXTSelection.FindString(Program.NXTConnectionID);
                 }
-            if (this.comboBoxPortSelection.SelectedIndex < 0)
+            //
+            // If we've still not got anything selected, then select the first known NXT
+            // that we've detected as having a live connected NXT.
+            // 
+            if (this.comboBoxNXTSelection.SelectedIndex < 0)
                 {
-                foreach (BluetoothSerialPort port in this.bluetoothPorts)
+                foreach (KnownNXT knownNXT in this.knownNXTs)
                     {
-                    if (port.HasNXTConnected)
+                    if (knownNXT.HasNXTConnected==true)
                         {
-                        this.comboBoxPortSelection.SelectedIndex = this.comboBoxPortSelection.FindString(port.ListBoxDisplayName);
+                        this.comboBoxNXTSelection.SelectedIndex = this.comboBoxNXTSelection.FindString(knownNXT.ListBoxDisplayName);
                         break;
                         }
                     }
                 }
-
-            // If we have nothing to connect to, give the user some (miniscule) feedback
-            if (null == this.SelectedPort)
+            //
+            // If there's nothing in the list of NXTs, then add something
+            //
+            if (this.comboBoxNXTSelection.Items.Count == 0)
                 {
-                this.comboBoxPortSelection.Items.Add("no NXTs detected");
-                this.comboBoxPortSelection.SelectedIndex = this.comboBoxPortSelection.Items.Count -1;
+                this.comboBoxNXTSelection.Items.Add("no NXTs detected");
+                }
+            // 
+            // Make sure something is selected
+            //
+            if (null == this.SelectedNXT)
+                {
+                this.comboBoxNXTSelection.SelectedIndex = this.comboBoxNXTSelection.Items.Count -1;
                 }
 
             UpdateEnabledState();
             }
 
-        void InitializeComboBoxMailbox()
+        //--------------------------------------------------------------------------
+        // Message processing
+        //--------------------------------------------------------------------------
+
+        protected override void WndProc(ref Message m)
             {
-            for (int i=0; i < 10; i++)
+            switch (m.Msg)
                 {
-                this.comboBoxMailbox.Items.Add(new NxtMailboxQueue(i));
+            case WIN32.WM_DEVICECHANGE:
+                {
+                switch ((int)m.WParam)
+                    {
+                case WIN32.DBT_DEVICEARRIVAL:
+                    if (null != this.DeviceArrived)
+                        this.DeviceArrived(this, m);
+                    break;
+                case WIN32.DBT_DEVICEREMOVECOMPLETE:
+                    if (null != this.DeviceRemoveComplete)
+                        this.DeviceRemoveComplete(this, m);
+                    break;
+                    }
                 }
-            this.comboBoxMailbox.SelectedIndex = this.comboBoxMailbox.FindString
-                (
-                Program.Mailbox != null 
-                    ? Program.Mailbox 
-                    : new NxtMailboxQueue(TelemetryFTCConnection.iMailbox).ListBoxDisplayName
-                );
+                break;
+                }
+            base.WndProc(ref m);
             }
+
+        public delegate void MsgEventHandler(object sender, Message m);
+
+        public event MsgEventHandler    DeviceArrived;
+        public event MsgEventHandler    DeviceRemoveComplete;
 
         //--------------------------------------------------------------------------
         // Utility
@@ -108,16 +143,16 @@ namespace TelemetryFTC
 
         public static void ShowWaitCursorWhile(Action action)
             {
-            bool fWasWait = false;
+            Cursor cursorPrev = null;
             try
                 {
-                fWasWait = Application.UseWaitCursor;
-                Application.UseWaitCursor = true;
+                cursorPrev = System.Windows.Forms.Cursor.Current;
+                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
                 action();
                 }
             finally
                 {
-                Application.UseWaitCursor = fWasWait;
+                System.Windows.Forms.Cursor.Current = cursorPrev;
                 }
             }
 
@@ -125,34 +160,41 @@ namespace TelemetryFTC
         // Display management
         //--------------------------------------------------------------------------
 
-        private void NxtLogUI_Shown(object sender, EventArgs e)
+        private void TelemetryFTCUI_Shown(object sender, EventArgs e)
             {
-            string strOld = labelPortSelection.Text;
-            labelPortSelection.Text = "(please wait)";
-            //
-            InitializeComboBoxPortSelection();
-            InitializeComboBoxMailbox();
+            string strOld = labelNXTSelection.Text;
+            labelNXTSelection.Text = "(please wait)";
             //
             this.checkBoxJoystickControl.Checked = Program.Joysticks && JoystickController.HasControllers();
             //
-            labelPortSelection.Text = strOld;
+            labelNXTSelection.Text = strOld;
+            //
+#if DEBUG
+            this.buttonQuery.Visible = true;
+            this.buttonPoll.Visible = true;
+#else
+            this.buttonQuery.Visible = false;
+            this.buttonPoll.Visible = false;
+#endif
+            //
+            InitializeComboBoxNXTSelection();
             }
 
-        public BluetoothSerialPort SelectedPort { get { 
-            if (-1 == this.comboBoxPortSelection.SelectedIndex)
+        public KnownNXT SelectedNXT { get { 
+            if (-1 == this.comboBoxNXTSelection.SelectedIndex)
                 return null;
             else
-                return this.comboBoxPortSelection.Items[this.comboBoxPortSelection.SelectedIndex] as BluetoothSerialPort;
+                return this.comboBoxNXTSelection.Items[this.comboBoxNXTSelection.SelectedIndex] as KnownNXT;
             }}
 
-        private void comboBoxPortSelection_SelectedIndexCommitted(object sender, EventArgs e)
+        private void comboBoxNXTSelection_SelectedIndexCommitted(object sender, EventArgs e)
             {
-            if (this.openedPort != null)
+            if (this.currentNXT != null)
                 {
-                if (this.openedPort != this.SelectedPort)
+                if (this.currentNXT != this.SelectedNXT)
                     {
-                    this.openedPort.Close();
-                    this.openedPort = null;
+                    this.currentNXT.Stop();
+                    this.currentNXT = null;
                     }
                 }
             UpdateEnabledState();
@@ -160,14 +202,15 @@ namespace TelemetryFTC
 
         string IntToWords(int i)
             {
-            switch (i)
+            string[] rgNames = new string[] { "zero", "one", "two", "three", "four", "five", "six" };
+            if (0 <= i && i < rgNames.Length)
                 {
-            case 0: return "zero";
-            case 1: return "one";
-            case 2: return "two";
-            default: return i.ToString();
+                return rgNames[i];
                 }
+            return i.ToString();
             }
+
+        static string sJoystickLabelFormatString = "{0} joystick controller{1} connected to PC";
 
         void EnableControls(bool fConnection, bool fDisconnection)
             {
@@ -175,12 +218,11 @@ namespace TelemetryFTC
 
             this.buttonConnect.Enabled             = fConnection;
             this.checkBoxJoystickControl.Enabled   = fConnection && JoystickController.HasControllers();
-            this.comboBoxMailbox.Enabled           = fConnection;
-            this.comboBoxPortSelection.Enabled     = fConnection;
+            this.comboBoxNXTSelection.Enabled      = fConnection;
 
-            this.textBoxLoggingDestination.Enabled = false; // fConnection;   // deprecated
+            this.textBoxTelemetryDestination.Enabled = false; // fConnection;   // deprecated
 
-            this.labelJoystickCount.Text = String.Format("{0} joystick{1} detected", 
+            this.labelJoystickCount.Text = String.Format(sJoystickLabelFormatString, 
                 IntToWords(JoystickController.Controllers.Count),
                 JoystickController.Controllers.Count != 1 ? "s" : ""
                 );
@@ -188,12 +230,12 @@ namespace TelemetryFTC
 
         public void UpdateEnabledState()
             {
-            BluetoothSerialPort port = SelectedPort;
-            if (null == port)
+            KnownNXT nxt = SelectedNXT;
+            if (null == nxt)
                 {
                 EnableControls(false, false);
                 }
-            else if (port.IsOpen)
+            else if (nxt.IsOpen)
                 {
                 EnableControls(false, true);
                 }
@@ -213,7 +255,7 @@ namespace TelemetryFTC
             Disconnect();
             }
 
-        private void NxtLogUI_FormClosing(object sender, FormClosingEventArgs e)
+        private void TelemetryFTCUI_FormClosing(object sender, FormClosingEventArgs e)
             {
             Disconnect();
             }
@@ -224,20 +266,18 @@ namespace TelemetryFTC
 
         void Connect()
             {
-            BluetoothSerialPort port = SelectedPort;
-            if (port != null)
+            KnownNXT nxt = this.SelectedNXT;
+            if (nxt != null)
                 {
-                if (!port.IsOpen)
+                if (!nxt.IsOpen)
                     {
                     ShowWaitCursorWhile(() => { 
                         try {
-                            // OpenLoggingDestination();
-                            port.Open(); 
-                            port.Run(this.checkBoxJoystickControl.Checked);
+                            nxt.Run(fUseJoystick: this.checkBoxJoystickControl.Checked);
                             }
                         catch (Exception e)
                             {
-                            Program.ReportError("Unable to connect: {0}", e.Message);
+                            Program.ReportError("Unable to connect to {0}: {1}", nxt.NxtName, e.Message);
                             }
                         });
                     UpdateEnabledState();
@@ -245,49 +285,63 @@ namespace TelemetryFTC
                 }
             }
 
-        void Disconnect()
+        public void Disconnect()
             {
-            BluetoothSerialPort port = SelectedPort;
-            if (port != null)
+            KnownNXT nxt = this.SelectedNXT;
+            if (nxt != null)
                 {
-                port.Stop();
-                port.Close();
-                CloseLoggingDestination();
+                nxt.Stop();
+                DisconnectTelemetryDestination();
                 UpdateEnabledState();
                 }
             }
 
+
         //--------------------------------------------------------------------------
-        // Logging destination 
+        // Telemetry destination 
         //--------------------------------------------------------------------------
 
-        public void OpenLoggingDestinationIfNecessary()
+        public void OpenTelemetryDestinationIfNecessary()
             {
+            // Deal with the fact that the sheet may have been manually closed,
+            // which would leave us with a dangling reference that will throw
+            // an exception if we try to use it.
+            if (null != Program.TelemetryContext.Sheet)
+                {
+                try {
+                    int dummy = Program.TelemetryContext.Sheet.Index;
+                    }
+                catch
+                    {
+                    Program.TelemetryContext.Initialize();
+                    }
+                }
+            //
             if (null == Program.TelemetryContext.Sheet)
                 {
-                OpenLoggingDestination();
+                OpenTelemetryDestination();
                 }
             }
 
-        void CloseLoggingDestination()
+        public void DisconnectTelemetryDestination()
             {
             Program.TelemetryContext.Initialize();
             }
 
-        void OpenLoggingDestination()
+        void OpenTelemetryDestination()
             {
-            if (null == this.pmkLoggingDestination && this.textBoxLoggingDestination.Text.Length > 0)
+            if (null == this.pmkTelemetryDestination && this.textBoxTelemetryDestination.Text.Length > 0)
                 {
-                this.pmkLoggingDestination = COM.MkParseDisplayName(this.textBoxLoggingDestination.Text);
+                this.pmkTelemetryDestination = WIN32.MkParseDisplayName(this.textBoxTelemetryDestination.Text);
                 }
             //
-            if (null != this.pmkLoggingDestination)
+            if (null != this.pmkTelemetryDestination)
                 {
                 // Bind the moniker!
                 //
-                COMTypes.IBindCtx pbc = COM.CreateBindContext();
+                COMTypes.IBindCtx pbc = WIN32.CreateBindContext();
                 object punk;
-                this.pmkLoggingDestination.BindToObject(pbc, null, ref COM.IID_IUnknown, out punk);
+                this.pmkTelemetryDestination.BindToObject(pbc, null, ref WIN32.IID_IUnknown, out punk);
                 //
                 // Is this Excel?
                 //
@@ -295,8 +349,8 @@ namespace TelemetryFTC
                 if (null != workbook)
                     {
                     // Make the target visible and selected
-                    COM.IOleClientSite clientSite = new COM.OleClientSite();
-                    ((COM.IOleObject)punk).DoVerb(COM.OLEIVERB.SHOW, IntPtr.Zero, clientSite, 0, IntPtr.Zero, IntPtr.Zero);
+                    WIN32.IOleClientSite clientSite = new WIN32.OleClientSite();
+                    ((WIN32.IOleObject)punk).DoVerb(WIN32.OLEIVERB.SHOW, IntPtr.Zero, clientSite, 0, IntPtr.Zero, IntPtr.Zero);
 
                     // Interogate the selection to get the range to use (we note just the upper left hand corner)
                     dynamic sel = ((Excel.Workbook)punk).Application.Selection;
@@ -313,7 +367,7 @@ namespace TelemetryFTC
                     if (cCellSelected >= cCellFullSheet)
                         {
                         Program.TelemetryContext.InitCursor(0,0);
-                        Program.TelemetryContext.Sheet.get_Range(TelemetryMessage.CellName(0,0)).Select();
+                        Program.TelemetryContext.Sheet.get_Range(TelemetryRecord.CellName(0,0)).Select();
                         }
                     else
                         {
@@ -322,12 +376,13 @@ namespace TelemetryFTC
                     }
                 else
                     {
-                    throw new InvalidComObjectException("logging destination not an Excel sheet");
+                    throw new InvalidComObjectException("telemetry destination not an Excel sheet");
                     }
                 }
             else
                 {
                 // Open a new Excel workbook
+                //
                 Excel.Application app = GetExcelApp();
                 app.Workbooks.Add();
                 Program.TelemetryContext.Sheet = (Excel.Worksheet)(app.Worksheets[1]);
@@ -346,7 +401,7 @@ namespace TelemetryFTC
 
             try {
                 // Get reference to Excel.Application from the Running Object Table
-	            app = (Excel.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
+                app = (Excel.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
                 if (app != null)
                     {
                     // Don't use any hidden excel instances that might be around
@@ -371,45 +426,45 @@ namespace TelemetryFTC
 
         const string cfLinkSource = "Link Source";
 
-        private void textBoxLoggingDestination_DragEnter(object sender, DragEventArgs e)
+        private void textBoxTelemetryDestination_DragEnter(object sender, DragEventArgs e)
             {
-            if (CanAcceptDrop(e))
+            if (this.CanAcceptDrop(e))
                 {
                 e.Effect = ComputeDropEffect(e);
                 }
             }
 
-        private void textBoxLoggingDestination_DragOver(object sender, DragEventArgs e)
+        private void textBoxTelemetryDestination_DragOver(object sender, DragEventArgs e)
             {
-            if (CanAcceptDrop(e))
+            if (this.CanAcceptDrop(e))
                 {
                 e.Effect = ComputeDropEffect(e);
                 }
             }
 
-        private void textBoxLoggingDestination_DragLeave(object sender, EventArgs e)
+        private void textBoxTelemetryDestination_DragLeave(object sender, EventArgs e)
             {
             }
 
-        private void textBoxLoggingDestination_DragDrop(object sender, DragEventArgs e)
+        private void textBoxTelemetryDestination_DragDrop(object sender, DragEventArgs e)
             {
-            if (CanAcceptDrop(e))
+            if (this.CanAcceptDrop(e))
                 {
                 // Dig out and reify the serialized moniker which is living in the Link Source
                 //
-                COMTypes.IMoniker pmkLoggingDestination = MonikerFromData(e.Data);
-                if (null != pmkLoggingDestination)
+                COMTypes.IMoniker pmkTelemetryDestination = MonikerFromData(e.Data);
+                if (null != pmkTelemetryDestination)
                     {
                     // Find out the moniker's display name
                     //
-                    COMTypes.IBindCtx pbc = COM.CreateBindContext();
+                    COMTypes.IBindCtx pbc = WIN32.CreateBindContext();
                     string displayName;
-                    pmkLoggingDestination.GetDisplayName(pbc, null, out displayName);
+                    pmkTelemetryDestination.GetDisplayName(pbc, null, out displayName);
                     //
                     // Put it on the screen and remember it
                     //
-                    this.textBoxLoggingDestination.Text = displayName;
-                    this.pmkLoggingDestination = pmkLoggingDestination;
+                    this.textBoxTelemetryDestination.Text = displayName;
+                    this.pmkTelemetryDestination = pmkTelemetryDestination;
                     }
 
                 // Report 'no dice' so the source leaves what we were dragging alone:
@@ -425,10 +480,10 @@ namespace TelemetryFTC
 
         COMTypes.IMoniker MonikerFromData(IDataObject oData)
             {
-            byte[] rgb = COM.GetData(oData, cfLinkSource);
+            byte[] rgb = WIN32.GetData(oData, cfLinkSource);
             if (null != rgb)
                 {
-                return COM.LoadMoniker(rgb);
+                return WIN32.LoadMoniker(rgb);
                 }
             return null;
             }
@@ -442,9 +497,9 @@ namespace TelemetryFTC
                 COMTypes.IMoniker pmk = MonikerFromData(e.Data);
                 if (null != pmk)
                     {
-                    COMTypes.IBindCtx pbc = COM.CreateBindContext();
+                    COMTypes.IBindCtx pbc = WIN32.CreateBindContext();
                     object punk;
-                    pmk.BindToObject(pbc, null, ref COM.IID_IUnknown, out punk);
+                    pmk.BindToObject(pbc, null, ref WIN32.IID_IUnknown, out punk);
                     Excel.Workbook workbook = punk as Excel.Workbook;
                     //
                     return workbook != null;
@@ -465,9 +520,9 @@ namespace TelemetryFTC
                 return DragDropEffects.None;
             }
 
-        private void textBoxLoggingDestination_TextChanged(object sender, EventArgs e)
+        private void textBoxTelemetryDestination_TextChanged(object sender, EventArgs e)
             {
-            this.pmkLoggingDestination = null;
+            this.pmkTelemetryDestination = null;
             }
 
         private void statusBarTeamWebSite_Click(object sender, EventArgs e)
@@ -480,36 +535,109 @@ namespace TelemetryFTC
             System.Diagnostics.Process.Start("http://www.ftc417.org/TelemetryFTC");
             }
 
+        //---------------------------------
+
         private void timerJoystickTransmission_Tick(object sender, EventArgs e)
-        // We use a timer to send joystick messages so as to keep the action on 
+        // We use a timer to send joystick telemetryMessages so as to keep the action on 
         // the thread/apartment in which all our DirectInput objects were created.
             {
-            if (null != Program.ActiveBTPort)
+            if (null != Program.CurrentNXT)
                 {
-                Program.ActiveBTPort.SendJoystickMessage();
+                Program.CurrentNXT.SendJoystickMessage();
                 }
             }
 
-        }
+        //---------------------------------
 
-    class NxtMailboxQueue   
-    // Just for being in a list box
-        {
-        //--------------------------------------------------------------------------
-        // State
-        //--------------------------------------------------------------------------
-    
-        int iMailbox;
+        bool fNXTWantsTelemetryPolling        = true;
+        bool fConnectionWantsTelemetryPolling = false;
+        int  msTelemetryPollingInterval       = 30;     // 0==as fast as possible (we don't use the timer in that case)
 
-        public string ListBoxDisplayName { get { return "mailbox" + (this.iMailbox+1); }}
+        public bool NXTWantsTelemetryPolling        { get { return this.fNXTWantsTelemetryPolling;        } set { this.fNXTWantsTelemetryPolling        = value; this.UpdateTelemetryPollingTimerState(); }}
+        public bool ConnectionWantsTelemetryPolling { get { return this.fConnectionWantsTelemetryPolling; } set { this.fConnectionWantsTelemetryPolling = value; this.UpdateTelemetryPollingTimerState(); }}
+        public int  TelemetryPollingInterval        { get { return this.msTelemetryPollingInterval; } set { this.msTelemetryPollingInterval = value; this.UpdateTelemetryPollingTimerState(); }}
 
-        //--------------------------------------------------------------------------
-        // Construction
-        //--------------------------------------------------------------------------
-
-        public NxtMailboxQueue(int iMailbox)
+        void UpdateTelemetryPollingTimerState()
             {
-            this.iMailbox = iMailbox;
+            bool fPollingEnabled = (this.fNXTWantsTelemetryPolling && this.fConnectionWantsTelemetryPolling);
+            if (fPollingEnabled)
+                {
+                // Manually send a first poll
+                //
+                if (!this.timerTelemetryPolling.Enabled)
+                    {
+                    SendTelemetryPollMessage();
+                    }
+
+                if (this.msTelemetryPollingInterval != 0)
+                    {
+                    this.timerTelemetryPolling.Interval = msTelemetryPollingInterval;
+                    if (!this.timerTelemetryPolling.Enabled)
+                        {
+                        Program.Trace("enabling telemetry polling");
+                        }
+                    this.timerTelemetryPolling.Enabled = true;
+                    }
+                else
+                    {
+                    if (this.timerTelemetryPolling.Enabled)
+                        {
+                        Program.Trace("disabling telemetry polling");
+                        }
+                    this.timerTelemetryPolling.Enabled = false;
+                    }
+                }
+            else
+                {
+                if (this.timerTelemetryPolling.Enabled)
+                    {
+                    Program.Trace("disabling telemetry polling");
+                    }
+                this.timerTelemetryPolling.Enabled = false;
+                }
+            }
+
+        private void timerTelemetryPolling_Tick(object sender, EventArgs e)
+            {
+            SendTelemetryPollMessage();
+            }
+
+        void SendTelemetryPollMessage()
+            {
+            if (null != Program.CurrentNXT)
+                {
+                Program.CurrentNXT.SendTelemetryPollMessage();
+                }
+            }
+
+        private void buttonAdvanced_Click(object sender, EventArgs e)
+            {
+            TelemetryFTCUIOptions options = new TelemetryFTCUIOptions();
+            options.ShowDialog(Program.TheForm);
+            }
+
+        private void buttonRescan_Click(object sender, EventArgs e)
+            {
+            // Repopulate the list of available NXTs
+            ShowWaitCursorWhile(() => 
+                {
+                this.Disconnect();
+                this.InitializeComboBoxNXTSelection();
+                });
+            }
+
+        private void buttonQuery_Click(object sender, EventArgs e)
+            {
+            if (null != Program.CurrentNXT)
+                {
+                Program.CurrentNXT.QueryAvailableNXTData();
+                }
+            }
+
+        private void buttonPoll_Click(object sender, EventArgs e)
+            {
+            SendTelemetryPollMessage();
             }
         }
+
     }

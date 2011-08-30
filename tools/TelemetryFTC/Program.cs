@@ -2,6 +2,7 @@
 // Program.cs
 //
 using System;
+using System.Runtime.InteropServices;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ namespace TelemetryFTC
 
         public Excel.Workbook               Workbook;
         public Excel.Worksheet              Sheet;
-        public IDictionary<int, Cursor>     Cursors;
+        public IDictionary<int, Cursor>     Cursors;    // keeps track of where the next record is to be written in each sheet
 
         public TelemetryContext()
             {
@@ -53,12 +54,12 @@ namespace TelemetryFTC
         // REVIEW: Some of these could be better factored into other locations.
         //--------------------------------------------------------------------------
 
-        public static string         Mailbox     = null;     // from command line arg
-        public static string         PortName    = null;     // from command line arg
-        public static bool           Joysticks   = true;     // from command line arg: enable joysticks if present
+        public static string         Mailbox         = null;     // from command line arg
+        public static string         NXTConnectionID = null;     // from command line arg
+        public static bool           Joysticks       = true;     // from command line arg: enable joysticks if present
 
         public static TelemetryFTCUI        TheForm          = null;                    // our sole instance of the UI
-        public static BluetoothSerialPort   ActiveBTPort     = null;                    // currently running/connected port
+        public static KnownNXT              CurrentNXT       = null;                    // currently running/connected NXT
         public static TelemetryContext      TelemetryContext = new TelemetryContext();  // where to put our received telemetry
 
         //--------------------------------------------------------------------------
@@ -73,21 +74,29 @@ namespace TelemetryFTC
         public static void ReportError(string sFormat, params object[] data)
             {
             string sMessage = String.Format(sFormat, data);
-            string sTitle   = "NxtLog";
+            string sTitle   = ProgramName;
             System.Windows.Forms.MessageBox.Show(sMessage, sTitle);
+            }
+
+        public static RET_T Fail<RET_T>()
+            {
+            System.Diagnostics.Debug.Fail("program exiting");
+            return default(RET_T);
             }
 
         //--------------------------------------------------------------------------
         // Argument processing
         //--------------------------------------------------------------------------
 
+        static string ProgramName = "TelemetryFTC";
+
         static void Usage()
             {
             Program.ReportError(
-                "usage: TelemetryFTC [-mailboxn] [-port COMn] [-nojoy]\n" +
+                "usage: {0} [-mailboxn] [-port COMn] [-nojoy]\n" +
                 "    -mailboxn    the 'mailbox' on the NXT. default: -mailbox2\n" +
                 "    -port COMn   the serial port on which NXT is found\n" +
-                "    -nojoy       do not enable joysticks by default"
+                "    -nojoy       do not enable joysticks by default", ProgramName
                 );
             AbortProgram();
             }
@@ -113,7 +122,7 @@ namespace TelemetryFTC
                             iArg++;
                             if (iArg < args.Length)
                                 {
-                                Program.PortName = args[iArg];
+                                Program.NXTConnectionID = args[iArg];
                                 continue;
                                 }
                             break;
@@ -136,9 +145,18 @@ namespace TelemetryFTC
                 }
             }
 
-        static void AbortProgram()
+        public static void AbortProgram()
             {
             System.Environment.Exit(-1);
+            }
+
+        //--------------------------------------------------------------------------
+        // Test Logic
+        //--------------------------------------------------------------------------
+
+        static void DoTest()
+            {
+            BluetoothConnection.GetNXTBluetoothSerialPortNames();
             }
 
         //--------------------------------------------------------------------------
@@ -155,9 +173,12 @@ namespace TelemetryFTC
         [STAThread]
         static void Main(string[] args)
             {
+            System.Threading.Thread.CurrentThread.Name = "Program.Main";
+
             ParseArgs(args);
             JoystickController.FindJoystickControllers();
             LaunchUserInterface();
+            // DoTest();
             }
         }
     }

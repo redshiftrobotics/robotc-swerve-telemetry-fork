@@ -1,10 +1,12 @@
 ﻿//
 // JoystickMessage.cs
 // 
+// Construction of the message sent to a NXT that carries the state of the joystick controllers.
+//
 namespace TelemetryFTC
     {
     //------------------------------------------------------------------------------------------------
-    // Joystick related messages
+    // Joystick related telemetryMessages
     //------------------------------------------------------------------------------------------------
 
     // Corresponding bit in 'buttons' field is (1<<(joybtn-1)
@@ -50,14 +52,14 @@ namespace TelemetryFTC
         // State
         //--------------------------------------------------------------------------
 
-        public JoystickNxtMessage msg;
+        public JoystickControllersAndGameControlNxtMessage msg;
         public int                ijyc;
         public const int          cb = 7;           // we use 7 bytes of msg
 
         public byte this[int ib]
             {
-            get { return this.msg[JoystickNxtMessage.dibJycFirst + this.ijyc * cb + ib]; }
-            set {        this.msg[JoystickNxtMessage.dibJycFirst + this.ijyc * cb + ib] = value ; }
+            get { return this.msg[JoystickControllersAndGameControlNxtMessage.dibJycFirst + this.ijyc * cb + ib]; }
+            set {        this.msg[JoystickControllersAndGameControlNxtMessage.dibJycFirst + this.ijyc * cb + ib] = value ; }
             }
 
         //--------------------------------------------------------------------------
@@ -84,7 +86,7 @@ namespace TelemetryFTC
         // Construction
         //--------------------------------------------------------------------------
 
-        public JoystickControllerMessage(JoystickNxtMessage msg, int ijyc)
+        public JoystickControllerMessage(JoystickControllersAndGameControlNxtMessage msg, int ijyc)
             {
             this.msg  = msg;
             this.ijyc = ijyc;
@@ -92,7 +94,7 @@ namespace TelemetryFTC
             }
         }
 
-    public class JoystickNxtMessage : MailboxNxtMessage
+    public class JoystickControllersAndGameControlNxtMessage : MessageWriteNxtMessage
     // Class that encapsulates the data we send to the NXT for joystick control
         {
         //--------------------------------------------------------------------------
@@ -117,7 +119,7 @@ namespace TelemetryFTC
         // Construction
         //--------------------------------------------------------------------------
 
-        public JoystickNxtMessage() : base(0 /*mailbox*/, cbPayload + cbExtra )
+        public JoystickControllersAndGameControlNxtMessage() : base(0 /*mailbox*/, cbPayload + cbExtra )
         // Initialize the message and read the current state of the joystick controllers
         // NOTE: this MUST be called in the main STA thread due to COM apartment considerations.
             {

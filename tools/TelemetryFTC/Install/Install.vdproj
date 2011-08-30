@@ -33,7 +33,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\Install.msi"
+        "OutputFilename" = "8:Debug\\TelemetryFTCInstall.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -50,6 +50,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
         "Release"
@@ -57,7 +70,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\Install.msi"
+        "OutputFilename" = "8:Release\\TelemetryFTCInstall.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -184,21 +197,21 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TelemetryFTC"
-        "ProductCode" = "8:{BF778995-A29C-4C8D-8AC2-988F166F53D3}"
-        "PackageCode" = "8:{615864AD-2035-4BDB-8154-4C7504EC0F93}"
+        "ProductCode" = "8:{9139BA46-261A-48F5-9738-757B7BB5300B}"
+        "PackageCode" = "8:{150910B7-A42B-4B75-9BD4-A5723C45DAD2}"
         "UpgradeCode" = "8:{B4672A1C-6305-410F-87AB-A240565B6A2D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.61"
+        "ProductVersion" = "8:0.8"
         "Manufacturer" = "8:FTC Team 417"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:"
+        "ARPHELPLINK" = "8:http://www.ftc417.org/telemetryFTC"
         "Title" = "8:TelemetryFTC"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Coding Gnomes"
+        "ARPCONTACT" = "8:FTC Team 417"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:Realtime telemetry for Mindstorms NXT into Microsoft Excel"
         "ARPURLINFOABOUT" = "8:http://www.ftc417.org"
@@ -734,7 +747,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_09E74144DE9A444D885879826631F8DE"
             {
-            "SourcePath" = "8:..\\obj\\x86\\Debug\\TelemetryFTC.exe"
+            "SourcePath" = "8:..\\obj\\x86\\Release\\TelemetryFTC.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_950E2602D63F4D8989B77992F5349952"

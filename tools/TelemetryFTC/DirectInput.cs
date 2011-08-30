@@ -7,20 +7,13 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace TelemetryFTC
     {
     //------------------------------------------------------------------------------------------------
     // Interfaces and DLL imports
     //------------------------------------------------------------------------------------------------
-
-    public partial class Windows
-        {
-        public const int MAX_PATH = 260;
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetModuleHandleW([MarshalAs(UnmanagedType.LPWStr)] string moduleName);
-        }
 
     [ComImport,Guid("BF798031-483A-4DA2-AA99-5D64ED369700"),InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IDirectInput8W
@@ -111,8 +104,8 @@ namespace TelemetryFTC
         public Guid guidInstance;
         public Guid guidProduct;
         public int  dwDevType;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=Windows.MAX_PATH)] public string tszInstanceName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=Windows.MAX_PATH)] public string tszProductName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=WIN32.MAX_PATH)] public string tszInstanceName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=WIN32.MAX_PATH)] public string tszProductName;
         public Guid guidFFDriver;
         public short wUsagePage;
         public short wUsage;
@@ -131,7 +124,7 @@ namespace TelemetryFTC
         public int   dwOfs;
         public int   dwType;
         public int   dwFlags;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=Windows.MAX_PATH)] public string tszName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=WIN32.MAX_PATH)] public string tszName;
         public int   dwFFMaxForce;
         public int   dwFFForceResolution;
         public short wCollectionNumber;
@@ -488,13 +481,13 @@ namespace TelemetryFTC
             {
             // Instantiate access to the main IDirectInput8 interface
             Guid   clsid = new Guid("25E609E4-B259-11CF-BFC7-444553540000");  // CLSID_DirectInput8
-            Guid   iid   = COM.IIDOf(typeof(IDirectInput8W));
+            Guid   iid   = WIN32.IIDOf(typeof(IDirectInput8W));
             object punk;
-            int hr = COM.CoCreateInstance(ref clsid, null, COM.CLSCTX.INPROC_SERVER, ref iid, out punk);
+            int hr = WIN32.CoCreateInstance(ref clsid, null, WIN32.CLSCTX.INPROC_SERVER, ref iid, out punk);
             if (0==hr)
                 {
                 pDirectInput8 = (IDirectInput8W)punk;
-                IntPtr hInstance = Windows.GetModuleHandleW(null);
+                IntPtr hInstance = WIN32.GetModuleHandleW(null);
                 pDirectInput8.Initialize(hInstance, 0x800);
                 }
             else

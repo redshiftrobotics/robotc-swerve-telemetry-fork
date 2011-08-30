@@ -2,7 +2,8 @@
 //
 // JoystickDriver.h
 //
-// A drop-in-compatible replacment for JoystickDriver.c, with enhancements and fixes.
+// A drop-in-compatible replacment for JoystickDriver.c, with enhancements and fixes. Brought
+// to you by FTC Team 417.
 //
 // With the TETRIX system, the PC Controller Station sends messages over Bluetooth or Samantha to the NXT
 // containing current settings of a PC joystick. The joystick settings arrive using the NXT
@@ -105,6 +106,14 @@ typedef enum
 int joyFlickDeadZone    = 45;
 int joyThrottleDeadZone = 15;
 
+#ifndef Max
+#define Max(a,b)    ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef Min
+#define Min(a,b)    ((a) < (b) ? (a) : (b))
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Structure declarations
@@ -197,42 +206,14 @@ BOOL getJoystickSettings(TJoystick& joystickVar);
 
 // 'Functions' for accessing the various state of the two joystick controllers. Note that these *assume*
 // that getJoystickSettings() was called with the variable 'joystick' as its parameter.
-#define joyBtn(jyc,btn)             ((joyBtnState(jyc) & joyBtnBit(btn)) != 0)
+#define joyBtn(jyc,btn)             ((_joyBtnState(jyc) & _joyBtnBit(btn)) != 0)
 #define joyHat(jyc,hatVal)          (joystick.msg.rgcnt[jyc-1].hat==(hatVal))
 #define joyX(jyc,ijoy)              (joystick.msg.rgcnt[jyc-1].rgjoy[ijoy].x)
 #define joyY(jyc,ijoy)              (joystick.msg.rgcnt[jyc-1].rgjoy[ijoy].y)
 
-#define joyBtnOnce_(jyc,btn)                                                    \
-    (joyBtn(jyc,btn)                                                            \
-        ? ((joyBtnOnceState(jyc) & joyBtnBit(btn)) != 0                         \
-                ? false                                                         \
-                : trueOf(joyBtnOnceState(jyc) |= joyBtnBit(btn)))               \
-        : falseOf(joyBtnOnceState(jyc) &= ~joyBtnBit(btn)))
-
+// Functions that test button and hat state but only return 'true' once per press
 BOOL joyBtnOnce(int jyc, int btn);
-
-#define joyHatOnce_(jyc,hat)                                                    \
-    ((joyHat(jyc,hat))                                                          \
-        ? ((joyHatOnceState(jyc) & joyHatBit(hat)) != 0                         \
-                ? false                                                         \
-                : trueOf(joyHatOnceState(jyc) |= joyHatBit(hat)))               \
-        : falseOf(joyHatOnceState(jyc) &= ~joyHatBit(hat)))
-
 BOOL joyHatOnce(int jyc, int hat);
-
-// Is the indicated joystick currently displaced in the indicated direction and beyond the dead zone?
-#define joyFlick_(jyc,ijoy,flick)                                                    \
-    (((flick) & JOYDIR_UP) && (joyY(jyc,ijoy) > joyFlickDeadZone)                   \
-        ? true                                                                      \
-        : (((flick) & JOYDIR_DOWN) && (joyY(jyc,ijoy) < -joyFlickDeadZone)          \
-            ? true                                                                  \
-            : (((flick) & JOYDIR_RIGHT) && (joyX(jyc,ijoy) > joyFlickDeadZone)      \
-                ? true                                                              \
-                : (((flick) & JOYDIR_LEFT) && (joyX(jyc,ijoy) < -joyFlickDeadZone)  \
-                    ? true                                                          \
-                    : false))))
-
-BOOL joyFlick(int jyc, int ijoy, int flick);
 
 // 'Flick'ing a joystick allows the four directions on each joystick (on each controller) to be used
 // very much like additional controller buttons (instead of, say, a throttle as is typically done
@@ -241,14 +222,14 @@ BOOL joyFlick(int jyc, int ijoy, int flick);
 // A 'flick once' will fire only once; it will not refire until the joystick is returned to the neutral
 // dead zone (this is similar to joyBtnOnce()). If instead you wish to repeatedly fire so long as
 // the joystick remains displaced, use joyFlick().
-#define joyFlickOnce_(jyc,ijoy,flick)                                            \
-    (joyFlick_(jyc,ijoy,flick)                                                   \
-        ? ((joyFlickState(jyc,ijoy) & (flick)) != 0                             \
-            ? false                                                             \
-            : trueOf(joyFlickState(jyc,ijoy) |= (flick)))                       \
-        : falseOf(joyFlickState(jyc,ijoy) &= ~(flick)))
-
 BOOL joyFlickOnce(int jyc, int ijoy, int flick);
+BOOL joyFlick(int jyc, int ijoy, int flick);
+
+// When was the last joystick message received?
+#define joyMessageTime()    joystick.msg.msReceived
+
+// How many joystick messages have we seen?
+#define joyMessageCount()   joystick.msg.serialNumber
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -271,13 +252,14 @@ BOOL joyFlickOnce(int jyc, int ijoy, int flick);
 #define joy2_Buttons    msg.rgcnt[1].buttons
 #define joy2_TopHat     msg.rgcnt[1].hat
 
-#define joy1Btn(btn)    ((joystick.msg.rgcnt[0].buttons & joyBtnBit(btn)) != 0)
-#define joy2Btn(btn)    ((joystick.msg.rgcnt[1].buttons & joyBtnBit(btn)) != 0)
+#define joy1Btn(btn)    ((joystick.msg.rgcnt[0].buttons & _joyBtnBit(btn)) != 0)
+#define joy2Btn(btn)    ((joystick.msg.rgcnt[1].buttons & _joyBtnBit(btn)) != 0)
 
 #define joyLeftX(jyc)   joyX(jyc,JOY_LEFT)
 #define joyLeftY(jyc)   joyY(jyc,JOY_LEFT)
 #define joyRightX(jyc)  joyX(jyc,JOY_RIGHT)
 #define joyRightY(jyc)  joyY(jyc,JOY_RIGHT)
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -285,51 +267,83 @@ BOOL joyFlickOnce(int jyc, int ijoy, int flick);
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define _joyBtnOnce_(jyc,btn)                                                   \
+    (joyBtn(jyc,btn)                                                            \
+        ? ((_joyBtnOnceState(jyc) & _joyBtnBit(btn)) != 0                       \
+                ? false                                                         \
+                : _trueOf(_joyBtnOnceState(jyc) |= _joyBtnBit(btn)))            \
+        : _falseOf(_joyBtnOnceState(jyc) &= ~_joyBtnBit(btn)))
+
+#define _joyHatOnce_(jyc,hat)                                                   \
+    ((joyHat(jyc,hat))                                                          \
+        ? ((_joyHatOnceState(jyc) & _joyHatBit(hat)) != 0                       \
+                ? false                                                         \
+                : _trueOf(_joyHatOnceState(jyc) |= _joyHatBit(hat)))            \
+        : _falseOf(_joyHatOnceState(jyc) &= ~_joyHatBit(hat)))
+
+#define _joyFlick_(jyc,ijoy,flick)                                                  \
+    (((flick) & JOYDIR_UP) && (joyY(jyc,ijoy) > joyFlickDeadZone)                   \
+        ? true                                                                      \
+        : (((flick) & JOYDIR_DOWN) && (joyY(jyc,ijoy) < -joyFlickDeadZone)          \
+            ? true                                                                  \
+            : (((flick) & JOYDIR_RIGHT) && (joyX(jyc,ijoy) > joyFlickDeadZone)      \
+                ? true                                                              \
+                : (((flick) & JOYDIR_LEFT) && (joyX(jyc,ijoy) < -joyFlickDeadZone)  \
+                    ? true                                                          \
+                    : false))))
+
+#define _joyFlickOnce_(jyc,ijoy,flick)                                          \
+    (_joyFlick_(jyc,ijoy,flick)                                                 \
+        ? ((_joyFlickState(jyc,ijoy) & (flick)) != 0                            \
+            ? false                                                             \
+            : _trueOf(_joyFlickState(jyc,ijoy) |= (flick)))                     \
+        : _falseOf(_joyFlickState(jyc,ijoy) &= ~(flick)))
+
 // The PC delivers joystick messages to a particular mailbox address in the NXT firmware, namely this one
 const TMailboxIDs kJoystickQueueID = mailbox1;
 
 // Internal buffer to hold the last received message from the PC (do not directly use)
-JOYSTICKSMSG joystickInternal;
+JOYSTICKSMSG _joystickInternal;
 
 // Copy the msg portion of the structure from the internal messaging state.
 // NB: memcpy, being one opcode, is atomic
-#define getJoystickSettingsPrim(joystickVar)     memcpy(joystickVar, joystickInternal, sizeof(joystickInternal))
+#define _getJoystickSettingsPrim(joystickVar)     memcpy(joystickVar, _joystickInternal, sizeof(_joystickInternal))
 
 // Update the joystick state. Answer whether there's anything new there to process.
 BOOL getJoystickSettings(TJoystick& joystickVar)
     {
     long serialNumberPrev = joystickVar.msg.serialNumber;
-    getJoystickSettingsPrim(joystickVar);
+    _getJoystickSettingsPrim(joystickVar);
     return joystickVar.msg.serialNumber != serialNumberPrev;
     }
 
-#define joyBtnBit(btn)              (1 << (btn - 1))
-#define joyHatBit(hat)              (1 << (hat))                        // 'hat' is from JOY_HAT. NB: don't use with '-1'
-#define joyBtnState(jyc)            joystick.msg.rgcnt[jyc-1].buttons
-#define joyHatState(jyc)            joystick.msg.rgcnt[jyc-1].hat
+#define _joyBtnBit(btn)              (1 << (btn - 1))
+#define _joyHatBit(hat)              (1 << (hat))                        // 'hat' is from JOY_HAT. NB: don't use with '-1'
+#define _joyBtnState(jyc)            joystick.msg.rgcnt[jyc-1].buttons
+#define _joyHatState(jyc)            joystick.msg.rgcnt[jyc-1].hat
 
-#define joyBtnOnceState(jyc)        joystick.rgaux[jyc-1].buttonsOnce
-#define joyHatOnceState(jyc)        joystick.rgaux[jyc-1].hatOnce
-#define joyFlickState(jyc,ijoy)     joystick.rgaux[jyc-1].rgflicks[ijoy]
+#define _joyBtnOnceState(jyc)        joystick.rgaux[jyc-1].buttonsOnce
+#define _joyHatOnceState(jyc)        joystick.rgaux[jyc-1].hatOnce
+#define _joyFlickState(jyc,ijoy)     joystick.rgaux[jyc-1].rgflicks[ijoy]
 
-#define trueOf(expr)                ((expr) || 1)
-#define falseOf(expr)               ((expr) && 0)
+#define _trueOf(expr)                ((expr) || 1)
+#define _falseOf(expr)               ((expr) && 0)
 
 BOOL joyBtnOnce(int jyc, int btn)
     {
-    return joyBtnOnce_(jyc, btn);
+    return _joyBtnOnce_(jyc, btn);
     }
 BOOL joyHatOnce(int jyc, int hat)
     {
-    return joyHatOnce_(jyc, hat);
+    return _joyHatOnce_(jyc, hat);
     }
 BOOL joyFlickOnce(int jyc, int ijoy, int flick)
     {
-    return joyFlickOnce_(jyc, ijoy, flick);
+    return _joyFlickOnce_(jyc, ijoy, flick);
     }
 BOOL joyFlick(int jyc, int ijoy, int flick)
     {
-    return joyFlick_(jyc, ijoy, flick);
+    return _joyFlick_(jyc, ijoy, flick);
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -341,16 +355,16 @@ BOOL joyFlick(int jyc, int ijoy, int flick)
 //
 // The task is very simple. It's an endless loop that continuously looks for a mailbox
 // message from the PC. When one is found, it reformats and copies the contents into the internal
-// "joystickInternal" buffer.
+// "_joystickInternal" buffer.
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define InitializeJoystickGlobals()                         \
-    {                                                       \
-    memset(joystickInternal, 0, sizeof(joystickInternal));  \
-    joystickInternal.fWaitForStart  = true;                 \
-    joystickInternal.rgcnt[0].hat   = -1;                   \
-    joystickInternal.rgcnt[1].hat   = -1;                   \
+#define InitializeJoystickGlobals()                          \
+    {                                                        \
+    memset(_joystickInternal, 0, sizeof(_joystickInternal)); \
+    _joystickInternal.fWaitForStart  = true;                 \
+    _joystickInternal.rgcnt[0].hat   = -1;                   \
+    _joystickInternal.rgcnt[1].hat   = -1;                   \
     }
 
 task readMsgFromPC()
@@ -407,22 +421,22 @@ task readMsgFromPC()
 
         hogCPU();   // grab CPU for duration of critical section
 
-        joystickInternal.fTeleOp                       = rgbT[1];
-        joystickInternal.fWaitForStart                 = rgbT[2];
+        _joystickInternal.fTeleOp                       = rgbT[1];
+        _joystickInternal.fWaitForStart                 = rgbT[2];
 
-        joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].x    = rgbT[3];
-        joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y    = rgbT[4];
-        joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].x   = rgbT[5];
-        joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y   = rgbT[6];
-        joystickInternal.rgcnt[0].buttons              = (rgbT[7] & 0x00FF) | (rgbT[8] << 8);
-        joystickInternal.rgcnt[0].hat                  = rgbT[9];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].x    = rgbT[3];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y    = rgbT[4];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].x   = rgbT[5];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y   = rgbT[6];
+        _joystickInternal.rgcnt[0].buttons              = (rgbT[7] & 0x00FF) | (rgbT[8] << 8);
+        _joystickInternal.rgcnt[0].hat                  = rgbT[9];
 
-        joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].x    = rgbT[10];
-        joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y    = rgbT[11];
-        joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].x   = rgbT[12];
-        joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y   = rgbT[13];
-        joystickInternal.rgcnt[1].buttons              = (rgbT[14] & 0x00FF) | (rgbT[15] << 8);
-        joystickInternal.rgcnt[1].hat                  = rgbT[16];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].x    = rgbT[10];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y    = rgbT[11];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].x   = rgbT[12];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y   = rgbT[13];
+        _joystickInternal.rgcnt[1].buttons              = (rgbT[14] & 0x00FF) | (rgbT[15] << 8);
+        _joystickInternal.rgcnt[1].hat                  = rgbT[16];
 
         // If control is started with *no* joysticks attached (or at least none logically connected
         // to RobotC) then the message that arrives from the PC has *entirely* zero values for all joysticks.
@@ -431,17 +445,17 @@ task readMsgFromPC()
         // some action to be taken by the program, almost certainly in error. As a work around, we
         // refuse to process any received messages until we see at least one with the first joystick's
         // hat not seemingly in the 'up' position. So: hands off the hat at the start of your program!
-        if ((joystickInternal.serialNumber != 0) || (joystickInternal.rgcnt[0].hat != 0))
+        if ((_joystickInternal.serialNumber != 0) || (_joystickInternal.rgcnt[0].hat != 0))
             {
-            joystickInternal.serialNumber++;
-            joystickInternal.msReceived = nSysTime;
+            _joystickInternal.serialNumber++;
+            _joystickInternal.msReceived = nSysTime;
             }
 
-        joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y    = -joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y;  // Negate to "natural" position
-        joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y   = -joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y; // Negate to "natural" position
+        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y    = -_joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y;  // Negate to "natural" position
+        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y   = -_joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y; // Negate to "natural" position
 
-        joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y    = -joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y;  // Negate to "natural" position
-        joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y   = -joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y; // Negate to "natural" position
+        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y    = -_joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y;  // Negate to "natural" position
+        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y   = -_joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y; // Negate to "natural" position
 
         releaseCPU(); // end of critical section
         }
@@ -525,7 +539,7 @@ task displayDiagnostics()
         {
         if (bDisplayDiagnostics)
             {
-            getJoystickSettingsPrim(joystick);                   // Update variables with current joystick values
+            _getJoystickSettingsPrim(joystick);               // Update variables with current joystick values
 
             if (joystick.msg.fWaitForStart)
                 nxtDisplayCenteredTextLine(1, "Wait for Start");
