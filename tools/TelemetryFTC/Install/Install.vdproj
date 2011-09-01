@@ -21,6 +21,48 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8464BD09B041473696562A40DD3EBF73"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8B965CC9BE9745508AA3255BE8633D88"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AF0859F6E8AD498FBD62701913F8D710"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CB47B0D976504ACABC255A40AB25DD8B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E7D373237C004DC0A269AB07460E514C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EEAC8E8350A74BC5B67D0C0961390D05"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F765D4A0C1D7469E8C90FCA47DB1A612"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_09E74144DE9A444D885879826631F8DE"
         "MsmSig" = "8:_UNDEFINED"
@@ -33,7 +75,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\TelemetryFTCInstall.msi"
+        "OutputFilename" = "8:Debug\\FTC417SskInstall.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -70,7 +112,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\TelemetryFTCInstall.msi"
+        "OutputFilename" = "8:Release\\FTC417SskInstall.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -130,6 +172,146 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8464BD09B041473696562A40DD3EBF73"
+            {
+            "SourcePath" = "8:..\\..\\..\\doc\\RobotC Advanced Topics.pptx"
+            "TargetName" = "8:RobotC Advanced Topics.pptx"
+            "Tag" = "8:"
+            "Folder" = "8:_9DE7ADCA78494246B55CA77ED6867216"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8B965CC9BE9745508AA3255BE8633D88"
+            {
+            "SourcePath" = "8:..\\..\\..\\src\\FTCField.h"
+            "TargetName" = "8:FTCField.h"
+            "Tag" = "8:"
+            "Folder" = "8:_6CC0E8F119CF4F7BB7D07BFFEA4A2E52"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AF0859F6E8AD498FBD62701913F8D710"
+            {
+            "SourcePath" = "8:..\\..\\..\\src\\Samples\\TelemetrySample.c"
+            "TargetName" = "8:TelemetrySample.c"
+            "Tag" = "8:"
+            "Folder" = "8:_3BDB8C55B7014D47B1695D4235E0EEC1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CB47B0D976504ACABC255A40AB25DD8B"
+            {
+            "SourcePath" = "8:..\\..\\..\\src\\Music.h"
+            "TargetName" = "8:Music.h"
+            "Tag" = "8:"
+            "Folder" = "8:_6CC0E8F119CF4F7BB7D07BFFEA4A2E52"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E7D373237C004DC0A269AB07460E514C"
+            {
+            "SourcePath" = "8:..\\..\\..\\src\\Lock.h"
+            "TargetName" = "8:Lock.h"
+            "Tag" = "8:"
+            "Folder" = "8:_6CC0E8F119CF4F7BB7D07BFFEA4A2E52"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EEAC8E8350A74BC5B67D0C0961390D05"
+            {
+            "SourcePath" = "8:..\\..\\..\\src\\JoystickDriver.h"
+            "TargetName" = "8:JoystickDriver.h"
+            "Tag" = "8:"
+            "Folder" = "8:_6CC0E8F119CF4F7BB7D07BFFEA4A2E52"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F765D4A0C1D7469E8C90FCA47DB1A612"
+            {
+            "SourcePath" = "8:..\\..\\..\\src\\Samples\\AutoTeleSample.c"
+            "TargetName" = "8:AutoTeleSample.c"
+            "Tag" = "8:"
+            "Folder" = "8:_3BDB8C55B7014D47B1695D4235E0EEC1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -149,7 +331,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_950E2602D63F4D8989B77992F5349952"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -157,6 +339,50 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_6CC0E8F119CF4F7BB7D07BFFEA4A2E52"
+                    {
+                    "Name" = "8:src"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_18A4D091F435420AB929497C3B228EB7"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_3BDB8C55B7014D47B1695D4235E0EEC1"
+                            {
+                            "Name" = "8:samples"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_516B5B0947DB48928462A3E207544918"
+                                "Folders"
+                                {
+                                }
+                            }
+                        }
+                    }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_9DE7ADCA78494246B55CA77ED6867216"
+                    {
+                    "Name" = "8:doc"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_9577F3AF0359450787778E6D6C4048DA"
+                        "Folders"
+                        {
+                        }
+                    }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_A59047AD91614D8FA15890554577E4EC"
+                    {
+                    "Name" = "8:bin"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_5E24A1E759CB4680B7C5114F5ABB7483"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_A50A429A5AAC4CAD81E734C4BD571FE2"
@@ -170,13 +396,35 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_94F2FB092DAC488E98ED24B73FB055A9"
                     {
-                    "Name" = "8:FTC417"
+                    "Name" = "8:FTC Team 417"
                     "AlwaysCreate" = "11:TRUE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
                     "Property" = "8:_77A821D8086940B3B96E233F6ECFA036"
                         "Folders"
                         {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_0BED1B1B23414274B17E9BBFBDCC132B"
+                            {
+                            "Name" = "8:samples"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_0BE721B5D18849C0920F13EC4EB77B5E"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_9F17B9C456C845F49B5F92BB2C0C61FE"
+                            {
+                            "Name" = "8:doc"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_52A28446A14F44AE9FC692B39AB11020"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                 }
@@ -196,24 +444,24 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:TelemetryFTC"
-        "ProductCode" = "8:{9139BA46-261A-48F5-9738-757B7BB5300B}"
-        "PackageCode" = "8:{150910B7-A42B-4B75-9BD4-A5723C45DAD2}"
+        "ProductName" = "8:FTC Team 417 Software Starter Kit"
+        "ProductCode" = "8:{9691D31B-29A7-4AEA-B403-D42EAE1BD7B2}"
+        "PackageCode" = "8:{B531B04F-381F-404B-B20B-77AD0AF13C6B}"
         "UpgradeCode" = "8:{B4672A1C-6305-410F-87AB-A240565B6A2D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.8"
+        "ProductVersion" = "8:0.81"
         "Manufacturer" = "8:FTC Team 417"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:http://www.ftc417.org/telemetryFTC"
-        "Title" = "8:TelemetryFTC"
+        "ARPHELPLINK" = "8:http://www.ftc417.org/ssk"
+        "Title" = "8:FTC Team 417 Software Starter Kit"
         "Subject" = "8:"
         "ARPCONTACT" = "8:FTC Team 417"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Realtime telemetry for Mindstorms NXT into Microsoft Excel"
+        "ARPCOMMENTS" = "8:FTC Team 417 Software Starter Kit"
         "ARPURLINFOABOUT" = "8:http://www.ftc417.org"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
@@ -318,6 +566,48 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_27A356F65491482AB2538058191342D3"
+            {
+            "Name" = "8:Seminar - RobotC Advanced Topics.pptx"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_8464BD09B041473696562A40DD3EBF73"
+            "Folder" = "8:_9F17B9C456C845F49B5F92BB2C0C61FE"
+            "WorkingFolder" = "8:_9DE7ADCA78494246B55CA77ED6867216"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_5975BF447E254A6BB6B5B5C7573ACE66"
+            {
+            "Name" = "8:TelemetrySample.c"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_AF0859F6E8AD498FBD62701913F8D710"
+            "Folder" = "8:_0BED1B1B23414274B17E9BBFBDCC132B"
+            "WorkingFolder" = "8:_3BDB8C55B7014D47B1695D4235E0EEC1"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_A9489F3AE325441D810CDAB9A8DAE746"
+            {
+            "Name" = "8:AutoTeleSample.c"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_F765D4A0C1D7469E8C90FCA47DB1A612"
+            "Folder" = "8:_0BED1B1B23414274B17E9BBFBDCC132B"
+            "WorkingFolder" = "8:_3BDB8C55B7014D47B1695D4235E0EEC1"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_ABC4B8DB14C746F78161B3D132936B59"
             {
             "Name" = "8:TelemetryFTC"
@@ -750,7 +1040,7 @@
             "SourcePath" = "8:..\\obj\\x86\\Release\\TelemetryFTC.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_950E2602D63F4D8989B77992F5349952"
+            "Folder" = "8:_A59047AD91614D8FA15890554577E4EC"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

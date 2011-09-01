@@ -1,7 +1,7 @@
 //
 // TelemetrySample.c, v0.8
 //
-//      Brought to you by FTC 417, September 2011
+// Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
 //
 // This file contains several examples of telemetry transmission.
 //
@@ -19,7 +19,7 @@ void DoCompletenessTest()
     // recorder to poll us as fast as it reasonably can.
     TelemetrySetUSBPollInterval(0);
 
-    // Emit a header row for easily remembering things.
+    // Emit a header row for easily remembering what the data actually means.
     TelemetryAddString("ms");
     TelemetryAddString("#");
     TelemetryAddString("i8");

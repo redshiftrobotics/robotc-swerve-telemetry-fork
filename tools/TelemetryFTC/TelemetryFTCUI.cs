@@ -162,21 +162,21 @@ namespace TelemetryFTC
 
         private void TelemetryFTCUI_Shown(object sender, EventArgs e)
             {
+            this.Text = String.Format("{0} v{1}", Program.ProgramName, Program.ProgramVersion);
+            //
             string strOld = labelNXTSelection.Text;
             labelNXTSelection.Text = "(please wait)";
             //
             this.checkBoxJoystickControl.Checked = Program.Joysticks && JoystickController.HasControllers();
             //
             labelNXTSelection.Text = strOld;
-            //
-#if DEBUG
+#if DEBUG   //
             this.buttonQuery.Visible = true;
             this.buttonPoll.Visible = true;
-#else
+#else       //
             this.buttonQuery.Visible = false;
             this.buttonPoll.Visible = false;
-#endif
-            //
+#endif      //
             InitializeComboBoxNXTSelection();
             }
 

@@ -261,7 +261,7 @@ namespace TelemetryFTC
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "TelemetryFTCUI";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "TelemetryFTC v0.8";
+            this.Text = "TelemetryFTC";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TelemetryFTCUI_FormClosing);
             this.Shown += new System.EventHandler(this.TelemetryFTCUI_Shown);
             this.statusBar.ResumeLayout(false);

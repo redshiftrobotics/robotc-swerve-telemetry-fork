@@ -2,8 +2,9 @@
 //
 // JoystickDriver.h
 //
-// A drop-in-compatible replacment for JoystickDriver.c, with enhancements and fixes. Brought
-// to you by FTC Team 417.
+// Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+//
+// A drop-in-compatible replacment for JoystickDriver.c, with enhancements and fixes.
 //
 // With the TETRIX system, the PC Controller Station sends messages over Bluetooth or Samantha to the NXT
 // containing current settings of a PC joystick. The joystick settings arrive using the NXT
@@ -359,7 +360,7 @@ BOOL joyFlick(int jyc, int ijoy, int flick)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define InitializeJoystickGlobals()                          \
+#define _InitializeJoystickGlobals_()                        \
     {                                                        \
     memset(_joystickInternal, 0, sizeof(_joystickInternal)); \
     _joystickInternal.fWaitForStart  = true;                 \
@@ -370,7 +371,7 @@ BOOL joyFlick(int jyc, int ijoy, int flick)
 task readMsgFromPC()
     {
     // Initialize setting to default values in case communications with PC is broken.
-    InitializeJoystickGlobals();
+    _InitializeJoystickGlobals_();
 
     while (true)
         {
@@ -508,7 +509,7 @@ const string kConfigName = "FTCConfig.txt";
 //
 //                                        displayDiagnostics
 //
-// THis task will display diagnostic information about a TETRIX robot on the NXT LCD.
+// This task will display diagnostic information about a TETRIX robot on the NXT LCD.
 //
 // If you want to use the LCD for your own debugging use, call the function
 // "disableDiagnosticsDisplay()
@@ -569,16 +570,22 @@ task displayDiagnostics()
 //                                    waitForStart
 //
 // Wait for the start of either the autonomous or tele-op phase. User program is running on the NXT
-// but the phase has not yet started. The FMS (Field Management System) is continually (every 50 msec)
-// sending information to the NXT. This program loops getting the latest value of joystick settings.
-// When it finds that the FMS has started the phase, it immediately returns.
+// but the phase has not yet started. The FC (Field Control System) is continually sending information
+// to the NXT. This program loops getting the latest value of joystick settings. When it finds that
+// the FCS has started the phase, it immediately returns.
 //
-// Note: this has been modified to provide an optional escape hatch.
+// Note: this has been modified to provide an optional escape hatch: pressing the Orange Button
+// will manually force a return from the waitForStart() call. This is useful for debugging and
+// prototyping situations.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef USE_WAIT_FOR_START
 #define USE_WAIT_FOR_START  1
+#endif
+
+#ifndef DISPLAY_MESSAGE_DEFAULT
+#define DISPLAY_MESSAGE_DEFAULT "<-all is well->"
 #endif
 
 #if USE_WAIT_FOR_START

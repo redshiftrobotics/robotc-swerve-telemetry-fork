@@ -88,7 +88,8 @@ namespace TelemetryFTC
         // Argument processing
         //--------------------------------------------------------------------------
 
-        static string ProgramName = "TelemetryFTC";
+        public static string ProgramName    = "TelemetryFTC";
+        public static string ProgramVersion = "0.81";
 
         static void Usage()
             {

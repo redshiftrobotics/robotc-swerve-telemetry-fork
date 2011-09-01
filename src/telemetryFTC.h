@@ -1,7 +1,7 @@
 //
-// TelemetryFTC.h, v0.8
+// TelemetryFTC.h
 //
-//      Brought to you by FTC Team 417, www.ftc417.org, September 2011
+// Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
 //
 // This file contains support for sending telemetry records in real time to a Microsoft
 // Excel spreadsheet. Actually recording the telemetry requires the use of the
