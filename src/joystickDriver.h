@@ -368,15 +368,20 @@ BOOL joyFlick(int jyc, int ijoy, int flick)
     _joystickInternal.rgcnt[1].hat   = -1;                   \
     }
 
+// Logically, _rgbJoyMsgT is a local variable to the readMsgFromPC task. However,
+// in RobotC 3.0, this needs to be truly global or a code-generation bug
+// (of as yet unknown nature) is tickled and the joystick no longer functions.
+const int _cbJoyMsgTMax = 19;       // 18 was good enough for RobotC 2.26, but ok if we always give more (and 3.0 needs 19 for some reason)
+sbyte _rgbJoyMsgT[_cbJoyMsgTMax];
+
 task readMsgFromPC()
     {
+
     // Initialize setting to default values in case communications with PC is broken.
     _InitializeJoystickGlobals_();
 
     while (true)
         {
-        const int kMaxSizeOfMessage = 18;
-        sbyte rgbT[kMaxSizeOfMessage];
 
         // Check to see if a message is available.
         BOOL fMsgFound = false;
@@ -403,15 +408,16 @@ task readMsgFromPC()
                 }
 
             // OK: there's at least one message there; read it!
-            if (cbMessage > sizeof(rgbT))
-                cbMessage = sizeof(rgbT);
+            if (cbMessage > sizeof(_rgbJoyMsgT))
+                cbMessage = sizeof(_rgbJoyMsgT);
 
             // cCmdMessageRead returns
             //      ioRsltSuccess      on success
             //      ioRsltEmptyMailbox if the message queue is empty (but we call cCmdMessageGetSize first above)
             //      ERR_INVALID_SIZE   if the buffer passed here is too small
             //      a few others
-            TFileIOResult nBTCmdRdErrorStatus = cCmdMessageRead((ubyte)rgbT, cbMessage, kJoystickQueueID);
+            TFileIOResult nBTCmdRdErrorStatus = cCmdMessageRead((ubyte)_rgbJoyMsgT, cbMessage, kJoystickQueueID);
+
             if (ioRsltSuccess == nBTCmdRdErrorStatus)
                 {
                 // Repeat loop until there are no more messages in the queue. We only want to process the
@@ -422,22 +428,22 @@ task readMsgFromPC()
 
         hogCPU();   // grab CPU for duration of critical section
 
-        _joystickInternal.fTeleOp                       = rgbT[1];
-        _joystickInternal.fWaitForStart                 = rgbT[2];
+        _joystickInternal.fTeleOp                       = _rgbJoyMsgT[1];
+        _joystickInternal.fWaitForStart                 = _rgbJoyMsgT[2];
 
-        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].x    = rgbT[3];
-        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y    = rgbT[4];
-        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].x   = rgbT[5];
-        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y   = rgbT[6];
-        _joystickInternal.rgcnt[0].buttons              = (rgbT[7] & 0x00FF) | (rgbT[8] << 8);
-        _joystickInternal.rgcnt[0].hat                  = rgbT[9];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].x    = _rgbJoyMsgT[3];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_LEFT].y    = _rgbJoyMsgT[4];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].x   = _rgbJoyMsgT[5];
+        _joystickInternal.rgcnt[0].rgjoy[JOY_RIGHT].y   = _rgbJoyMsgT[6];
+        _joystickInternal.rgcnt[0].buttons              = (_rgbJoyMsgT[7] & 0x00FF) | (_rgbJoyMsgT[8] << 8);
+        _joystickInternal.rgcnt[0].hat                  = _rgbJoyMsgT[9];
 
-        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].x    = rgbT[10];
-        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y    = rgbT[11];
-        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].x   = rgbT[12];
-        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y   = rgbT[13];
-        _joystickInternal.rgcnt[1].buttons              = (rgbT[14] & 0x00FF) | (rgbT[15] << 8);
-        _joystickInternal.rgcnt[1].hat                  = rgbT[16];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].x    = _rgbJoyMsgT[10];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_LEFT].y    = _rgbJoyMsgT[11];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].x   = _rgbJoyMsgT[12];
+        _joystickInternal.rgcnt[1].rgjoy[JOY_RIGHT].y   = _rgbJoyMsgT[13];
+        _joystickInternal.rgcnt[1].buttons              = (_rgbJoyMsgT[14] & 0x00FF) | (_rgbJoyMsgT[15] << 8);
+        _joystickInternal.rgcnt[1].hat                  = _rgbJoyMsgT[16];
 
         // If control is started with *no* joysticks attached (or at least none logically connected
         // to RobotC) then the message that arrives from the PC has *entirely* zero values for all joysticks.
@@ -533,13 +539,14 @@ task displayDiagnostics()
     string szFileName;
     getUserControlProgram(szFileName);
 
-    nxtDisplayTextLine(6, "Teleop FileName:");
-    nxtDisplayTextLine(7, szFileName);
     bNxtLCDStatusDisplay = true;
-    while (bDisplayDiagnostics)
+    while (true)
         {
         if (bDisplayDiagnostics)
             {
+            nxtDisplayTextLine(6, "Teleop FileName:");
+            nxtDisplayTextLine(7, szFileName);
+
             _getJoystickSettingsPrim(joystick);               // Update variables with current joystick values
 
             if (joystick.msg.fWaitForStart)
