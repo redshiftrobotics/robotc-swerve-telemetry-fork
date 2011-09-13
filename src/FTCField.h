@@ -17,8 +17,13 @@
 // orange button. The (a) and (b) parts of the UI are executed using the left and
 // right gray arrows, while (c) is executed by pressing the gray button.
 //
-// Be sure to #include this file *before* you #include "joystickDriver.h" as it overrides
-// some defaults that are found therein.
+// Be sure to #include this file *before* you #include "joystickDriver.h" as it preempts
+// some defaults that will be found therein.
+//
+// Note: the concept of 'left' vs 'right' side of the field was appropriate for
+// the 2010-11 Get Over It competition, and may not be the most useful for later
+// years. For now, the notion remains here in the code, but that may be adapted
+// to something more useful in later games.
 
 //-------------------------------------------------------------------------------------
 // Variables and defaults
@@ -97,8 +102,10 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
 #define MS_DISPLAYMSG 750
 
 // Some of the messages we wish to show need some composition
-#define DisplayFormattedMessageTemporarily1(duration, message, param)            { string s; StringFormat(s, message, param); DisplayMessageTemporarily(duration, s); }
-#define DisplayFormattedMessageTemporarily2(duration, message, param1, param2)   { string s; StringFormat(s, message, param1, param2); DisplayMessageTemporarily(duration, s); }
+#define DisplayFormattedMessageTemporarily1(message, param)            { string s; StringFormat(s, message, param); DisplayMessageTemporarily(MS_DISPLAYMSG, s); }
+#define DisplayFormattedMessageTemporarily2(message, param1, param2)   { string s; StringFormat(s, message, param1, param2); DisplayMessageTemporarily(MS_DISPLAYMSG, s); }
+#define DisplayFormattedMessage1(message, param)                       { string s; StringFormat(s, message, param); DisplayMessage(s); }
+#define DisplayFormattedMessage2(message, param1, param2)              { string s; StringFormat(s, message, param1, param2); DisplayMessage(s); }
 
 // Define here so this file is self-contained. However, a better solution
 // is to actually play the music; see Music.h.
@@ -107,6 +114,9 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
 #endif
 #ifndef PlayMusicNoWait
 #define PlayMusicNoWait(music,tempo,beat) PlayMusic(music,tempo,beat)
+#endif
+#ifndef Click()
+#define Click() PlayTone(440, 1)
 #endif
 
 // We can press the left or right arrow keys to indicate
@@ -135,19 +145,20 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
         startingSide = STARTING_SIDE_LEFT;                                                              \
         PlayHappyNoWait();                                                                              \
         }                                                                                               \
-    DisplayFormattedMessageTemporarily1(MS_DISPLAYMSG, "%s side", rgstrStartingSide[startingSide]);     \
+    DisplayFormattedMessageTemporarily1("%s side", rgstrStartingSide[startingSide]);                    \
     }
 
 #define WaitForStartInit()                                                                              \
     {                                                                                                   \
     nNxtExitClicks = 2;                                                                                 \
     OrangeButtonWaitInit();                                                                             \
-    DisplayMessageTemporarily(MS_DISPLAYMSG, rgstrProgramFlavor[programFlavor]);                        \
+    DisplayMessage(rgstrProgramFlavor[programFlavor]);                                                  \
     PlayTeamColorFeedback();                                                                            \
     }
 
 #define WaitForStartDone()                                                                              \
     {                                                                                                   \
+    Beep();                                                                                             \
     OrangeButtonWaitDone();                                                                             \
     nNxtExitClicks = 1;                                                                                 \
     }
@@ -191,12 +202,12 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
                 {                                                                                       \
                 programFlavor = PROGRAM_FLAVOR_AUTONOMOUS;                                              \
                 teamColor     = TEAM_COLOR_RED;                                                         \
-                DisplayFormattedMessageTemporarily2(MS_DISPLAYMSG, "%s %s", rgstrProgramFlavor[programFlavor], rgstrTeamColor[teamColor]); \
+                DisplayFormattedMessage2("%s %s", rgstrProgramFlavor[programFlavor], rgstrTeamColor[teamColor]); \
                 }                                                                                       \
             else                                                                                        \
                 {                                                                                       \
                 programFlavor = PROGRAM_FLAVOR_TELEOP;                                                  \
-                DisplayFormattedMessageTemporarily1(MS_DISPLAYMSG, "%s", rgstrProgramFlavor[programFlavor]); \
+                DisplayFormattedMessage1("%s", rgstrProgramFlavor[programFlavor]); \
                 }                                                                                       \
             PlayTeamColorFeedback();                                                                    \
             }                                                                                           \
@@ -213,12 +224,12 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
                 {                                                                                       \
                 programFlavor = PROGRAM_FLAVOR_AUTONOMOUS;                                              \
                 teamColor   = TEAM_COLOR_BLUE;                                                          \
-                DisplayFormattedMessageTemporarily2(MS_DISPLAYMSG, "%s %s", rgstrProgramFlavor[programFlavor], rgstrTeamColor[teamColor]); \
+                DisplayFormattedMessage2("%s %s", rgstrProgramFlavor[programFlavor], rgstrTeamColor[teamColor]); \
                 }                                                                                       \
             else                                                                                        \
                 {                                                                                       \
                 programFlavor = PROGRAM_FLAVOR_TELEOP;                                                  \
-                DisplayFormattedMessageTemporarily1(MS_DISPLAYMSG, "%s", rgstrProgramFlavor[programFlavor]); \
+                DisplayFormattedMessage1("%s", rgstrProgramFlavor[programFlavor]); \
                 }                                                                                       \
             PlayTeamColorFeedback();                                                                    \
             }                                                                                           \

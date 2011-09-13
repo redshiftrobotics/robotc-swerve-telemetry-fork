@@ -1,5 +1,5 @@
 //
-// TelemetrySample.c, v0.8
+// TelemetrySample.c
 //
 // Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
 //

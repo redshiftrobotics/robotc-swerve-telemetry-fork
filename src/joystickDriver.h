@@ -14,6 +14,11 @@
 // calls getJoystickSettings(joystick), and then uses joyBtn(), joyHat(), joyX(), joyY() etc to
 // examine the joystick state.
 //
+// Note that for the Logictech Gamepad F310 controller this code presently only functions
+// correctly when the mode switch on the bottom of the controller is in 'D' mode rather
+// than 'X' mode. The 'D' mode emulates a Logitech Dual Action controller, which was found
+// in the original FTC kits.
+//
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if defined(NXT) || defined(TETRIX)
@@ -44,6 +49,10 @@ typedef enum
     JOYBTN_2                    =2,
     JOYBTN_3                    =3,
     JOYBTN_4                    =4,
+    JOYBTN_X                    =JOYBTN_1,
+    JOYBTN_Y                    =JOYBTN_4,
+    JOYBTN_A                    =JOYBTN_2,
+    JOYBTN_B                    =JOYBTN_3,
     JOYBTN_LEFTTRIGGER_UPPER    =5,
     JOYBTN_RIGHTTRIGGER_UPPER   =6,
     JOYBTN_LEFTTRIGGER_LOWER    =7,
@@ -614,7 +623,7 @@ task displayDiagnostics()
 #define OrangeButtonWaitFeedback()  {                                                                                        \
                                     if (OrangeButtonWaitDoFeedback())                                                        \
                                         {                                                                                    \
-                                        DisplayMessage(OrangeButtonWaitCond() ? "!wait==orange" : "waiting for start");      \
+                                        DisplayMessage((MsSinceWaitForStart() / 2000 % 2 == 0) ? "orange==go" : "wait for start"); \
                                         }                                                                                    \
                                     }
 #define OrangeButtonWaitDone()      {                                                                                        \

@@ -101,13 +101,14 @@ void DoTeleOp(int jyc)
             }
         else if (joyMessageCount() > 0 && nSysTime - joyMessageTime() > MS_JOYSTICK_FCS_DISCONNECTED_THRESHOLD)
             {
-            /* We haven't received a new message from the FCS in WAY too long  */
-            /* So we have to consider ourselves disconnected. We take steps to */
+            /* We've seen some joystick messages in the past, but we haven't   */
+            /* a message in a long time. So we have to consider that we've     */
+            /* the connection with the Field Control System>. We take steps to */
             /* reign in a possibly runaway robot.                              */
             motor[motorLeft]  = 0;
             motor[motorRight] = 0;
 
-            /* Play an alarm */
+            /* And we play play an audible alarm. */
             Beep(NOTE_E);
             }
         }

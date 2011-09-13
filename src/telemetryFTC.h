@@ -164,7 +164,8 @@
 // Control whether telemetry is transmitted over Bluetooth and/or USB.
 //
 #define TelemetryUseBluetooth(useBluetooth)  { telemetry._useBluetooth = (useBluetooth); }
-#define TelemetryUseUSB(useUSB)              { telemetry._useUSB = (usUSB); }
+#define TelemetryUseUSB(useUSB)              { telemetry._useUSB = (useUSB); }
+#define TelemetryUse(useBluetooth,useUSB)    { TelemetryUseBluetooth(useBluetooth); TelemetryUseUSB(useUSB); }
 //
 // Control whether telemetry accumulation and transmission is active or is suppressed.
 //
