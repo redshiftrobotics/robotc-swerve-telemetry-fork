@@ -1,7 +1,8 @@
 //
 // TelemetryFTC.h
 //
-// Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+// Originally part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+// Forked by the SAAS Robotics team: https://github.com/saasrobotics/telemetry
 //
 // This file contains support for sending telemetry records in real time to a Microsoft
 // Excel spreadsheet. Actually recording the telemetry requires the use of the
@@ -616,7 +617,7 @@ void _TelemetrySend_(_TELEMETRY& t, int isheet, bool fFinalize=true)
                 {
                 EndTimeSlice();
                 }
-            cCmdMessageWriteToBluetooth(_FirstTelemetryTag_(t), _CbTelemetryRecord_(t), t._bluetoothMailbox);
+            cCmdMessageWriteToBluetooth(nBTCurrentStreamIndex, _FirstTelemetryTag_(t), _CbTelemetryRecord_(t), t._bluetoothMailbox);
             while (nBluetoothCmdStatus==ioRsltCommPending)
                 {
                 EndTimeSlice();

@@ -34,7 +34,7 @@
 
 #include "..\FTCField.h"
 #include "..\JoystickDriver.h"
-#include "..\Music.h"
+//#include "..\Music.h"
 
 void InitializeMain()
     {
@@ -93,7 +93,7 @@ void DoTeleOp(int jyc)
             //
             if (joyBtnOnce(jyc, JOYBTN_LEFTTRIGGER_UPPER))
                 {
-                PlayHappy();
+                //PlayHappy();
                 }
 
             // Use the joysticks to manually drive the robot
@@ -109,7 +109,7 @@ void DoTeleOp(int jyc)
             motor[motorRight] = 0;
 
             /* And we play play an audible alarm. */
-            Beep(NOTE_E);
+            //Beep(NOTE_E);
             }
         }
     }

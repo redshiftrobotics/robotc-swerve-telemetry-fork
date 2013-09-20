@@ -1,7 +1,8 @@
 //
 // FTCField.h
 //
-// Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+// Originally part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+// Forked by the SAAS Robotics team: https://github.com/saasrobotics/telemetry
 //
 // Implementation of a user interface on the NXT by which one can:
 //

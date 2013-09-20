@@ -2,7 +2,8 @@
 //
 // JoystickDriver.h
 //
-// Part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+// Originally part of the FTC Team 417 Software Starter Kit: www.ftc417.org/ssk
+// Forked by the SAAS Robotics team: https://github.com/saasrobotics/telemetry
 //
 // A drop-in-compatible replacment for JoystickDriver.c, with enhancements and fixes.
 //
@@ -425,7 +426,7 @@ task readMsgFromPC()
             //      ioRsltEmptyMailbox if the message queue is empty (but we call cCmdMessageGetSize first above)
             //      ERR_INVALID_SIZE   if the buffer passed here is too small
             //      a few others
-            TFileIOResult nBTCmdRdErrorStatus = cCmdMessageRead((ubyte)_rgbJoyMsgT, cbMessage, kJoystickQueueID);
+            TFileIOResult nBTCmdRdErrorStatus = cCmdMessageRead((ubyte*)_rgbJoyMsgT, cbMessage, kJoystickQueueID);
 
             if (ioRsltSuccess == nBTCmdRdErrorStatus)
                 {
