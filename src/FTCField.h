@@ -139,12 +139,12 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
     if (STARTING_SIDE_LEFT==startingSide)                                                               \
         {                                                                                               \
         startingSide = STARTING_SIDE_RIGHT;                                                             \
-        PlaySadNoWait();                                                                                \
+        /*PlaySadNoWait();*/                                                                                \
         }                                                                                               \
     else                                                                                                \
         {                                                                                               \
         startingSide = STARTING_SIDE_LEFT;                                                              \
-        PlayHappyNoWait();                                                                              \
+        /*PlayHappyNoWait();*/                                                                              \
         }                                                                                               \
     DisplayFormattedMessageTemporarily1("%s side", rgstrStartingSide[startingSide]);                    \
     }
@@ -159,7 +159,7 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
 
 #define WaitForStartDone()                                                                              \
     {                                                                                                   \
-    Beep();                                                                                             \
+    /*Beep();*/                                                                                             \
     OrangeButtonWaitDone();                                                                             \
     nNxtExitClicks = 1;                                                                                 \
     }
@@ -189,7 +189,7 @@ BOOL            fUseProgramDemoMode = false;                    // are we to use
         /* toggle demo mode */                                                                          \
         fUseProgramDemoMode = !fUseProgramDemoMode;                                                     \
         DisplayMessageTemporarily(MS_DISPLAYMSG, fUseProgramDemoMode ? "demo mode" : "normal mode");    \
-        Beep();                                                                                         \
+        /*Beep();*/                                                                                         \
         }                                                                                               \
     else if (kLeftButton == nNxtButtonPressed)                                                          \
         {                                                                                               \
