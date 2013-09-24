@@ -617,7 +617,7 @@ void _TelemetrySend_(_TELEMETRY& t, int isheet, bool fFinalize=true)
                 {
                 EndTimeSlice();
                 }
-            cCmdMessageWriteToBluetooth(nBTCurrentStreamIndex, _FirstTelemetryTag_(t), _CbTelemetryRecord_(t), t._bluetoothMailbox);
+            cCmdMessageWriteToBluetooth(nBTCurrentStreamIndex, (ubyte*)_FirstTelemetryTag_(t), _CbTelemetryRecord_(t), t._bluetoothMailbox);
             while (nBluetoothCmdStatus==ioRsltCommPending)
                 {
                 EndTimeSlice();
