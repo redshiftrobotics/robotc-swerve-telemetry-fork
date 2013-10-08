@@ -34,14 +34,11 @@
 
 #include "..\FTCField.h"
 #include "..\JoystickDriver.h"
-#include "..\telemetryFTC.h"
 //#include "..\Music.h"
 
 void InitializeMain()
     {
-    TelemetryInitialize();
-    TelemetryUseBluetooth(true);
-    TelemetryUseUSB(false);
+    // Put any necessary initialization code here
     }
 
 void DoManualDrivingControl(int jyc)
@@ -119,9 +116,7 @@ void DoTeleOp(int jyc)
 
 void DoAutonomous()
     {
-    	TelemetryAddString("telemetry");
-    	TelemetrySend();
-    	Sleep(1000);
+    // Implement your autonomous logic here
     }
 
 task main()
