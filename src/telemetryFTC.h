@@ -394,7 +394,7 @@ _TELEMETRY telemetry;   // The one _TELEMETRY variable
     ubyte rgbPtr[2];                            \
     rgbPtr[0] = 0;                              \
     rgbPtr[1] = 0;                              \
-    nxtWriteIOMap(_strCommMap, ioResult, rgbPtr[0], _dibHsInBuf + _dibHSBUFInPtr, 2);  \
+    nxtWriteIOMap(_strCommMap, ioResult, (byte*)rgbPtr[0], _dibHsInBuf + _dibHSBUFInPtr, 2);  \
     }
 
 typedef enum
@@ -617,7 +617,7 @@ void _TelemetrySend_(_TELEMETRY& t, int isheet, bool fFinalize=true)
                 {
                 EndTimeSlice();
                 }
-            cCmdMessageWriteToBluetooth(nBTCurrentStreamIndex, _FirstTelemetryTag_(t), _CbTelemetryRecord_(t), t._bluetoothMailbox);
+            cCmdMessageWriteToBluetooth(nBTCurrentStreamIndex, (ubyte*)_FirstTelemetryTag_(t), _CbTelemetryRecord_(t), t._bluetoothMailbox);
             while (nBluetoothCmdStatus==ioRsltCommPending)
                 {
                 EndTimeSlice();
@@ -631,7 +631,7 @@ void _TelemetrySend_(_TELEMETRY& t, int isheet, bool fFinalize=true)
 
             // Find out the current location of the circular buffer pointers
             ubyte rgbPtr[2];
-            nxtReadIOMap(_strCommMap, ioResult, rgbPtr[0], _dibHsInBuf + _dibHSBUFInPtr, 2);
+            nxtReadIOMap(_strCommMap, ioResult, (byte*)rgbPtr[0], _dibHsInBuf + _dibHSBUFInPtr, 2);
             int ibInPtr  = rgbPtr[0];
             int ibOutPtr = rgbPtr[1];   // this may become stale while we run, but that will only increase available space, so it's safe
 
@@ -656,7 +656,7 @@ void _TelemetrySend_(_TELEMETRY& t, int isheet, bool fFinalize=true)
 
                 // Update the in ptr. This will, atomically, make the data available for transmission in the 'Poll' command
                 rgbPtr[0] = (ibInPtr + cbToWrite) & (cbBuffer-1);
-                nxtWriteIOMap(_strCommMap, ioResult, rgbPtr[0], _dibHsInBuf + _dibHSBUFInPtr, 1);
+                nxtWriteIOMap(_strCommMap, ioResult, (byte*)rgbPtr[0], _dibHsInBuf + _dibHSBUFInPtr, 1);
                 }
             else
                 {

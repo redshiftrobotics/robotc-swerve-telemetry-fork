@@ -46,7 +46,7 @@ void DoCompletenessTest()
         bool   fDatum   = (iDatum % 2 == 0);
         char   chDatum  = 'a' + (telemetry.serialNumber % 26);
         char   rgch[4]; rgch[0] = chDatum; rgch[1] = (chDatum+1); rgch[2] = (chDatum+2); rgch[3] = 0;
-        string sDatum; StringFromChars(sDatum, rgch[0]);
+        string sDatum; StringFromChars(sDatum, (char*)rgch[0]);
         float  flDatum  = 3.14159 * telemetry.serialNumber / 180.0;
         //
         TelemetryAddInt8(iDatum);
