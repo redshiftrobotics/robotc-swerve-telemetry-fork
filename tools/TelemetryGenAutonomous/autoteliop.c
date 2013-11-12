@@ -10,12 +10,12 @@
 
 const int DATA_ARRAY_SIZE = /*INSPA*/;
 
-const int motor1EncoderData[DATA_ARRAY_SIZE] = {28, -113, -422, -743, -914};
-const int motor2EncoderData[DATA_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-const int motor3EncoderData[DATA_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-const int motor4EncoderData[DATA_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-const int motor5EncoderData[DATA_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-const int motor6EncoderData[DATA_ARRAY_SIZE] = {0, 0, 0, 0, 0};
+const int motor1MotorData[DATA_ARRAY_SIZE] = /*INSPB*/;
+const int motor2MotorData[DATA_ARRAY_SIZE] = /*INSPC*/;
+const int motor3MotorData[DATA_ARRAY_SIZE] = /*INSPD*/;
+const int motor4MotorData[DATA_ARRAY_SIZE] = /*INSPE*/;
+const int motor5MotorData[DATA_ARRAY_SIZE] = /*INSPF*/;
+const int motor6MotorData[DATA_ARRAY_SIZE] = /*INSPG*/;
 
 task main()
 {
@@ -28,12 +28,12 @@ task main()
 			motors map correctly due to the fact that the association is kept in sync betwen the data collection
 			program and this one.
 		*/
-		I2C_SetEncoderPosition(S1, 1, 1, motor1EncoderData[i], 100);
-		I2C_SetEncoderPosition(S1, 1, 2, motor2EncoderData[i], 100);
-		I2C_SetEncoderPosition(S1, 2, 1, motor3EncoderData[i], 100);
-		I2C_SetEncoderPosition(S1, 2, 2, motor4EncoderData[i], 100);
-		I2C_SetEncoderPosition(S1, 3, 1, motor5EncoderData[i], 100);
-		I2C_SetEncoderPosition(S1, 3, 2, motor6EncoderData[i], 100);
+		I2C_SetMotorSpeed(S1, 1, 1, motor1MotorData[i]);
+		I2C_SetMotorSpeed(S1, 1, 2, motor2MotorData[i]);
+		I2C_SetMotorSpeed(S1, 2, 1, motor3MotorData[i]);
+		I2C_SetMotorSpeed(S1, 2, 2, motor4MotorData[i]);
+		I2C_SetMotorSpeed(S1, 3, 1, motor5MotorData[i]);
+		I2C_SetMotorSpeed(S1, 3, 2, motor6MotorData[i]);
 		// match the sampling rate of the original telemetry program
 		Sleep(100);
 	}
