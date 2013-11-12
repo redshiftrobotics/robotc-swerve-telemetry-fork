@@ -6,13 +6,30 @@
 
 #include "../../../Robotics2013-14/libraries/Motors.h"
 #include "../../src/telemetryFTC.h"
+#include "JoystickDriver.c"
+
+/*
+
+	IMPORTANT: DESIGNED FOR SAAS VARSITY'S JARVIS CHASSIS.
+
+*/
+
+// universal to all telemetry-enabled teliops
+int Telemetry_MotorPowerData[6] = {0, 0, 0, 0, 0, 0};
+
+// specific to this particular teliop
+int rightpower, leftpower = 0;
+int rightpowerGlobal, leftpowerGlobal = 0;
 
 task updateTelemetry()
 {
 	while (true)
 	{
-		TelemetryAddInt32(I2C_GetEncoderPosition(S1, 1, 1));
+		TelemetryAddInt32(rightpowerGlobal);
+		TelemetryAddInt32(leftpowerGlobal);
 		TelemetrySend();
+
+		// sampling rate control
 		Sleep(100);
 	}
 }
@@ -22,7 +39,32 @@ task main()
 	// initialize telemetry data collection
 	TelemetryInitialize();
 	StartTask(updateTelemetry);
-	I2C_SetEncoderPosition(S1, 1, 1, 1000, 100);
-	I2C_SetEncoderPosition(S1, 1, 1, -1000, 100);
-	Sleep(10000000);
+	while(true)
+	{
+		rightpower = joystick.joy1_y2/2;		//read joystick y values (both sticks)
+		leftpower = joystick.joy1_y1/2;
+
+		if(abs(rightpower) < 8)			//deadband with threshold of 8
+		{
+			rightpower = 0;
+		}
+
+		if(abs(leftpower) < 8)			//deadband with threshold of 8
+
+		{
+			leftpower = 0;
+		}
+
+		rightpowerGlobal = rightpower;
+		leftpowerGlobal = -leftpower;
+
+		// give telemetry some data to report back
+		// FIXME, this is not the optimal way to do this
+		Telemetry_MotorPowerData[3] = rightpowerGlobal;
+		Telemetry_MotorPowerData[4] = leftpowerGlobal;
+
+		I2C_SetMotorSpeed(S1, 2, 1, rightpowerGlobal);
+		I2C_SetMotorSpeed(S1, 2, 2, leftpowerGlobal);
+		Sleep(10);
+	}
 }
