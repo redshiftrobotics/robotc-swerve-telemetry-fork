@@ -35,7 +35,7 @@ task main()
 		I2C_SetMotorSpeed(S1, 3, 1, motor5MotorData[i]);
 		I2C_SetMotorSpeed(S1, 3, 2, motor6MotorData[i]);
 		// match the sampling rate of the original telemetry program
-		Sleep(100);
+		Sleep(50);
 	}
 
 }

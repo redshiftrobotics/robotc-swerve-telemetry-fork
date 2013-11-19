@@ -16,6 +16,7 @@
 
 // universal to all telemetry-enabled teliops
 int Telemetry_MotorPowerData[6] = {0, 0, 0, 0, 0, 0};
+const int Telemetry_SampleRate = 50;
 
 // specific to this particular teliop
 int rightpower, leftpower = 0;
