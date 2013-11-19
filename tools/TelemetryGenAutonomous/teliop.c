@@ -26,12 +26,14 @@ task updateTelemetry()
 {
 	while (true)
 	{
-		TelemetryAddInt32(rightpowerGlobal);
-		TelemetryAddInt32(leftpowerGlobal);
+		// right
+		TelemetryAddInt32(Telemetry_MotorPowerData[3]);
+		// left
+		TelemetryAddInt32(Telemetry_MotorPowerData[4]);
 		TelemetrySend();
 
 		// sampling rate control
-		Sleep(100);
+		Sleep(Telemetry_SampleRate);
 	}
 }
 
@@ -45,12 +47,12 @@ task main()
 		rightpower = joystick.joy1_y2/2;		//read joystick y values (both sticks)
 		leftpower = joystick.joy1_y1/2;
 
-		if(abs(rightpower) < 8)			//deadband with threshold of 8
+		if(abs(rightpower) < 8) //deadband with threshold of 8
 		{
 			rightpower = 0;
 		}
 
-		if(abs(leftpower) < 8)			//deadband with threshold of 8
+		if(abs(leftpower) < 8) //deadband with threshold of 8
 
 		{
 			leftpower = 0;
